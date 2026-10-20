@@ -4,7 +4,8 @@ import assert from 'node:assert/strict';
 import {config} from '../src/content.mjs';
 
 const deployment=new URL(process.env.PAGES_SITE_URL||'');
-assert.equal(deployment.protocol,'https:','GitHub Pages requires an HTTPS site URL');
+assert(['http:','https:'].includes(deployment.protocol),'GitHub Pages requires an HTTP or HTTPS site URL');
+deployment.protocol='https:';
 assert(!deployment.search&&!deployment.hash,'The deployment URL cannot contain a query or fragment');
 const base=deployment.href.replace(/\/$/,'');
 const prefix=deployment.pathname.replace(/\/$/,'');

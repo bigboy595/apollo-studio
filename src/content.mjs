@@ -1,7 +1,7 @@
 export const config = {
   title:'Разработка сайтов для производственных компаний — Apollo',
   description:'Создаём сайты и каталоги для производственных компаний: структура, тексты, дизайн и запуск. Реальные кейсы «Фундкреп» и Nikateam. Ориентир — от 120 000 ₽.',
-  price:'120 000',currency:'₽',timeline:'4–6 недель',publicDomain:null,indexable:false,previewOrigin:'https://apollo-industrial.mishanka2008.chatgpt.site',updatedAt:'2026-10-20',metrikaId:null,verification:{google:null,yandex:null},
+  price:'120 000',currency:'₽',timeline:'4–6 недель',publicDomain:'https://apollo.su',indexable:true,previewOrigin:'https://apollo-industrial.mishanka2008.chatgpt.site',updatedAt:'2026-10-20',metrikaId:null,verification:{google:null,yandex:null},
   contacts:{telegram:'https://t.me/apollo_mng',telegramLabel:'@apollo_mng',email:'manager@apollo.su',phone:'+79164180573',phoneLabel:'+7 (916) 418-05-73'},
   cases:{fundkrep:{url:'https://fundkrep.ru/'},nikateam:{url:'https://nikateam.ru/'}},
   projectScope:{pages:7,productCards:10,uniqueTemplates:3,forms:2,correctionsDays:30,
