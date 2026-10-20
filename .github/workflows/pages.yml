@@ -57,6 +57,33 @@ jobs:
       - name: Read GitHub Pages configuration
         id: pages
         uses: actions/configure-pages@v5
+      - name: Enable HTTPS enforcement when permitted
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          const url='https://api.github.com/repos/'+process.env.GITHUB_REPOSITORY+'/pages';
+          const headers={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','Content-Type':'application/json'};
+          const read=await fetch(url,{headers});
+          if(!read.ok)throw new Error('Cannot inspect HTTPS settings: '+read.status);
+          const pages=await read.json();
+          if(pages.https_enforced){
+            console.log('HTTPS_ENFORCED already enabled');
+          }else if(pages.https_certificate?.state!=='approved'){
+            console.log('HTTPS_CERTIFICATE_PENDING; GitHub will finish certificate issuance after DNS validation.');
+          }else{
+            const response=await fetch(url,{method:'PUT',headers,body:JSON.stringify({https_enforced:true})});
+            if(response.ok){
+              const check=await fetch(url,{headers});
+              const value=await check.json();
+              if(!value.https_enforced)throw new Error('GitHub did not confirm HTTPS enforcement');
+              console.log('HTTPS_ENFORCED enabled');
+            }else if(response.status===403){
+              console.log('HTTPS_SETTINGS_ADMIN_REQUIRED: the repository administrator must enable Enforce HTTPS in Settings / Pages.');
+            }else throw new Error('Could not enforce HTTPS: '+response.status);
+          }
+          NODE
       - name: Read domain configuration
         env:
           GH_TOKEN: ${{ github.token }}
