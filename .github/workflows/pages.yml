@@ -1,0 +1,112 @@
+name: Publish Apollo to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out Apollo
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Build all pages
+        run: npm run build
+      - name: Verify source pages and links
+        run: npm run check
+      - name: Verify root and project URL support
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import {mkdtemp,cp,rm} from 'node:fs/promises';
+          import {tmpdir} from 'node:os';
+          import {join} from 'node:path';
+          import {spawnSync} from 'node:child_process';
+          import {config} from './src/content.mjs';
+          const urls=config.publicDomain&&config.indexable?[config.publicDomain]:['https://apollo.example','https://bigboy595.github.io/apollo-studio'];
+          for(const url of urls){
+            const directory=await mkdtemp(join(tmpdir(),'apollo-pages-'));
+            try{
+              await cp('dist',directory,{recursive:true});
+              const result=spawnSync(process.execPath,['scripts/prepare-pages.mjs'],{stdio:'inherit',env:{...process.env,PAGES_SITE_URL:url,PAGES_OUTPUT_DIR:directory}});
+              if(result.status!==0)process.exit(result.status||1);
+            }finally{await rm(directory,{recursive:true,force:true});}
+          }
+          NODE
+      - name: Read GitHub Pages configuration
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Prepare published URLs and resources
+        env:
+          PAGES_SITE_URL: ${{ steps.pages.outputs.base_url }}
+        run: node scripts/prepare-pages.mjs
+      - name: Upload the website
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+      - name: Deploy the website
+        id: deployment
+        uses: actions/deploy-pages@v5
+      - name: Verify the live website
+        env:
+          PAGES_SITE_URL: ${{ steps.deployment.outputs.page_url }}
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFile,readdir} from 'node:fs/promises';
+          import {resolve,relative,sep} from 'node:path';
+          import {setTimeout} from 'node:timers/promises';
+          import assert from 'node:assert/strict';
+          const base=process.env.PAGES_SITE_URL.replace(/\/$/,'');
+          const root=resolve('dist');
+          async function files(dir){
+            const out=[];
+            for(const entry of await readdir(dir,{withFileTypes:true})){
+              if(entry.name.startsWith('.'))continue;
+              const path=resolve(dir,entry.name);
+              out.push(...entry.isDirectory()?await files(path):[path]);
+            }
+            return out;
+          }
+          async function verify(path,retries=6){
+            const name=relative(root,path).split(sep).join('/');
+            const route=name==='index.html'?'':name.endsWith('/index.html')?name.slice(0,-10):name;
+            const url=base+'/'+route;
+            const expected=await readFile(path);
+            let problem;
+            for(let attempt=0;attempt<retries;attempt++){
+              try{
+                const response=await fetch(url,{signal:AbortSignal.timeout(20000),cache:'no-store'});
+                assert(response.ok,'HTTP '+response.status);
+                assert(Buffer.from(await response.arrayBuffer()).equals(expected),'Published bytes differ from the built file');
+                return;
+              }catch(error){problem=error;if(attempt+1<retries)await setTimeout(5000);}
+            }
+            throw new Error('Live verification failed for '+url+': '+problem.message);
+          }
+          await verify(resolve(root,'index.html'),24);
+          const paths=(await files(root)).filter(path=>path!==resolve(root,'index.html'));
+          for(let i=0;i<paths.length;i+=4)await Promise.all(paths.slice(i,i+4).map(path=>verify(path)));
+          console.log('LIVE_OK '+base+'; verified '+(paths.length+1)+' published HTML, CSS, JavaScript, image, font and metadata files.');
+          NODE
