@@ -1,0 +1,123 @@
+name: Import Apollo source archive
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/apollo-import-request.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apollo-source-import
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Import and verify the approved Apollo archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: python
+        run: |
+          import base64, hashlib, io, json, os, pathlib, re, urllib.parse, urllib.request, zipfile
+          
+          repo = os.environ["GITHUB_REPOSITORY"]
+          token = os.environ["GH_TOKEN"]
+          api_root = "https://api.github.com/repos/" + repo
+          request_path = ".github/apollo-import-request.json"
+          
+          def api(method, suffix, payload=None):
+              body = None if payload is None else json.dumps(payload).encode()
+              headers = {"Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "Apollo-source-import"}
+              if body is not None:
+                  headers["Content-Type"] = "application/json"
+              request = urllib.request.Request(api_root + suffix, data=body, headers=headers, method=method)
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  return json.load(response)
+          
+          event_sha = os.environ["GITHUB_SHA"]
+          configuration = api("GET", "/contents/" + request_path + "?ref=" + event_sha)
+          configuration = json.loads(base64.b64decode(configuration["content"]))
+          url = configuration["archive_url"]
+          print("::add-mask::" + url, flush=True)
+          parsed = urllib.parse.urlsplit(url)
+          if parsed.scheme != "https" or not parsed.hostname or not parsed.hostname.endswith(".oaiusercontent.com"):
+              raise RuntimeError("Archive host is outside the authorized source service")
+          expected_size = int(configuration["size_bytes"])
+          if not 0 < expected_size < 50_000_000:
+              raise RuntimeError("Unexpected archive size")
+          with urllib.request.urlopen(url, timeout=90) as response:
+              archive_bytes = response.read(expected_size + 1)
+          if len(archive_bytes) != expected_size:
+              raise RuntimeError("Archive size does not match the approved source")
+          print("Archive SHA256:", hashlib.sha256(archive_bytes).hexdigest(), flush=True)
+          
+          source_files = {}
+          excluded_paths = []
+          with zipfile.ZipFile(io.BytesIO(archive_bytes)) as archive:
+              entries = [info for info in archive.infolist() if not info.is_dir()]
+              if len(entries) > 2000 or sum(info.file_size for info in entries) > 100_000_000:
+                  raise RuntimeError("Archive exceeds source import limits")
+              paths = [pathlib.PurePosixPath(info.filename) for info in entries]
+              for path in paths:
+                  if path.is_absolute() or ".." in path.parts:
+                      raise RuntimeError("Archive contains an unsafe path")
+              first = paths[0].parts[0] if paths else ""
+              strip_root = bool(paths) and all(len(path.parts) > 1 and path.parts[0] == first for path in paths)
+              for info, original_path in zip(entries, paths):
+                  path = pathlib.PurePosixPath(*original_path.parts[1:]) if strip_root else original_path
+                  name = path.as_posix()
+                  if any(part in {".git", "node_modules", "__pycache__", ".venv", "__MACOSX"} for part in path.parts):
+                      excluded_paths.append(name)
+                      continue
+                  if path.name == ".DS_Store" or (path.name.startswith(".env") and path.name not in {".env.example", ".env.sample", ".env.template"}):
+                      excluded_paths.append(name)
+                      continue
+                  if name.startswith(".github/workflows/") or name == request_path:
+                      excluded_paths.append(name)
+                      continue
+                  if ((info.external_attr >> 16) & 0o170000) == 0o120000:
+                      raise RuntimeError("Archive contains a symbolic link")
+                  content = archive.read(info)
+                  if re.search(rb"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|(?:ghp_|gho_|ghu_|ghs_)[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,}", content):
+                      raise RuntimeError("Possible credential found in source file: " + name)
+                  if name in source_files:
+                      raise RuntimeError("Duplicate source path: " + name)
+                  source_files[name] = content
+          
+          html_count = sum(name.endswith(".html") for name in source_files)
+          if not any(name == "index.html" or name.endswith("/index.html") for name in source_files) or len(source_files) < 10:
+              raise RuntimeError("Archive does not contain a complete site")
+          metadata = api("GET", "")
+          if metadata.get("visibility") != "private":
+              raise RuntimeError("Source import requires the approved private repository")
+          branch = metadata["default_branch"]
+          encoded_branch = urllib.parse.quote(branch, safe="")
+          head = api("GET", "/branches/" + encoded_branch)["commit"]
+          tree_entries = []
+          expected_blobs = {}
+          for name, content in sorted(source_files.items()):
+              expected_sha = hashlib.sha1(b"blob " + str(len(content)).encode() + b"\0" + content).hexdigest()
+              blob = api("POST", "/git/blobs", {"content": base64.b64encode(content).decode(), "encoding": "base64"})
+              if blob["sha"] != expected_sha:
+                  raise RuntimeError("Source blob verification failed: " + name)
+              expected_blobs[name] = expected_sha
+              tree_entries.append({"path": name, "mode": "100644", "type": "blob", "sha": expected_sha})
+          tree_entries.append({"path": request_path, "mode": "100644", "type": "blob", "sha": None})
+          tree = api("POST", "/git/trees", {"base_tree": head["commit"]["tree"]["sha"], "tree": tree_entries})
+          verified_tree = api("GET", "/git/trees/" + tree["sha"] + "?recursive=1")
+          actual_blobs = {entry["path"]: entry["sha"] for entry in verified_tree["tree"] if entry["type"] == "blob"}
+          if any(actual_blobs.get(name) != sha for name, sha in expected_blobs.items()):
+              raise RuntimeError("Committed source tree verification failed")
+          commit = api("POST", "/git/commits", {"message": "Import complete Apollo studio website source", "tree": tree["sha"], "parents": [head["sha"]]})
+          api("PATCH", "/git/refs/heads/" + encoded_branch, {"sha": commit["sha"], "force": False})
+          print("Imported source files:", len(source_files), flush=True)
+          print("HTML documents:", html_count, flush=True)
+          print("Source commit:", commit["sha"], flush=True)
+          if excluded_paths:
+              print("Excluded runtime and local-only files:", ", ".join(sorted(excluded_paths)), flush=True)
