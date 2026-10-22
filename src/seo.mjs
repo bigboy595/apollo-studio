@@ -16,7 +16,7 @@ export function graph({path='/',title=c.title,description=c.description,caseName
  if(breadcrumbs.length){nodes.push({'@type':'BreadcrumbList','@id':url+'#breadcrumbs',itemListElement:[{name:'Apollo',path:'/'},...breadcrumbs].map((b,i)=>({'@type':'ListItem',position:i+1,name:b.name,item:base+b.path}))});nodes[2].breadcrumb={'@id':url+'#breadcrumbs'};}
  if(caseName)nodes.push({'@type':'CreativeWork','@id':url+'#project',name:caseName,description,creator:{'@id':org},image:base+image});
  if(serviceName)nodes.push({'@type':'Service','@id':url+'#service',name:serviceName,description,provider:{'@id':org},url});
- if(article)nodes.push({'@type':'Article','@id':url+'#article',headline:article.title,description,mainEntityOfPage:{'@id':url+'#webpage'},author:{'@id':org},publisher:{'@id':org},datePublished:c.updatedAt,dateModified:c.updatedAt,inLanguage:'ru-RU',image:base+image});
+ if(article)nodes.push({'@type':'Article','@id':url+'#article',headline:article.title,description,mainEntityOfPage:{'@id':url+'#webpage'},author:{'@id':org},publisher:{'@id':org},datePublished:c.publishedAt||c.updatedAt,dateModified:c.updatedAt,inLanguage:'ru-RU',image:base+image});
  return {'@context':'https://schema.org','@graph':nodes};
 }
 export function head(meta={}){

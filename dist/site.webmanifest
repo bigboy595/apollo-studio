@@ -1,1 +1,1 @@
-{"name":"Apollo — digital studio","short_name":"Apollo","start_url":"/","display":"browser","theme_color":"#090c0b","background_color":"#090c0b","icons":[{"src":"/assets/apollo-logo-square.png","sizes":"512x512","type":"image/png"}]}
+{"name":"Apollo — digital studio","short_name":"Apollo","start_url":"/","display":"browser","theme_color":"#090c0b","background_color":"#090c0b","icons":[{"src":"/assets/apollo-logo-square.png","sizes":"512x512","type":"image/png"}],"scope":"/"}
