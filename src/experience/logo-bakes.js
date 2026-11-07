@@ -1,0 +1,1 @@
+export const logoBakes=[{"src":"/assets/intro/pillar-1.webp","x":0.15636363636363637,"y":0.362,"width":0.22727272727272727,"height":0.551},{"src":"/assets/intro/pillar-2.webp","x":0.38545454545454544,"y":0.249,"width":0.22818181818181818,"height":0.656},{"src":"/assets/intro/pillar-3.webp","x":0.5909090909090909,"y":0.14,"width":0.27090909090909093,"height":0.759}];

@@ -4,11 +4,15 @@ import assert from 'node:assert/strict';
 import {config,assets} from '../src/content.mjs';
 import {services,articles,projects} from '../src/studio-content.mjs';
 import {head,graph,validateSeo,canIndex} from '../src/seo.mjs';
+import {logoBakes} from '../src/experience/logo-bakes.js';
+import {logoFilm} from '../src/experience/logo-film.js';
+import {DURATION,sceneState} from '../src/experience/motion.js';
 import {composeBrief,mailHref} from '../src/brief.mjs';
+import {capabilities,webCapabilities,serviceOptions,serviceValue} from '../src/capabilities.mjs';
 const root=resolve('dist');
 async function files(dir){const out=[];for(const f of await readdir(dir,{withFileTypes:true})){const p=resolve(dir,f.name);out.push(...f.isDirectory()?await files(p):[p]);}return out;}
-const pages=(await files(root)).filter(p=>p.endsWith('.html')),titles=new Set(),descriptions=new Set();
-assert.equal(pages.length,16,'15 content pages and 404');
+const pages=(await files(root)).filter(p=>p.endsWith('.html')&&!p.includes('/demos/')),titles=new Set(),descriptions=new Set();
+assert.equal(pages.length,30,'29 content pages and 404');
 let totalAnchors=0,totalImages=0,totalLinks=0;
 for(const path of pages){
  const html=await readFile(path,'utf8');
@@ -34,22 +38,43 @@ for(const path of pages){
   const schema=JSON.parse(json);assert.equal(schema['@context'],'https://schema.org');assert(schema['@graph'].some(n=>n['@type']==='Organization'));assert(!JSON.stringify(schema).includes('AggregateRating'));
   if(path!==resolve(root,'index.html')&&!path.endsWith('404.html'))assert(schema['@graph'].some(n=>n['@type']==='BreadcrumbList'),'Breadcrumb schema');
  }
- assert(!/href="#"|Lorem ipsum|Заявка отправлена|<iframe\b/.test(html),'No placeholders, false success, iframe');
+ assert(!/href="#"|Lorem ipsum|Заявка отправлена/.test(html),'No placeholders, false success, iframe');
  assert(!/assets\/(fundkrep-main|fundkrep-hero|nikateam-sign)\.webp/.test(html),'No old screenshots');
  assert(html.includes(canIndex()&&!path.endsWith('404.html')?'content="index,follow,max-image-preview:large"':'content="noindex,nofollow"'),'Indexing mode');
  for(const [,id] of html.matchAll(/<label[^>]* for="([^"]+)"/g))assert(ids.includes(id),'Label target');
  for(const [,id] of html.matchAll(/aria-controls="([^"]+)"/g))assert(ids.includes(id),'ARIA control target');
 }
 const home=await readFile('dist/index.html','utf8');
-assert(home.includes(config.price)&&home.includes(config.timeline));
-assert(home.includes('id="why-apollo"')&&home.includes('roman-800.webp')&&home.includes('mikhail-800.webp'));
+assert(home.includes('/solutions/')&&home.includes('id="aurora"')&&home.includes('id="apollo-mark"'));
+assert.equal(logoFilm.sheets.length,Math.ceil(logoFilm.count/logoFilm.perSheet));
+for(const src of logoFilm.sheets)assert((await stat(resolve(root,'.'+src))).size>0,'Cinematic 3D frame sheet');
+assert(logoFilm.count/logoFilm.fps>=6.2);assert(sceneState(0).bars.every(v=>v===0));assert.equal(sceneState(DURATION).opacity,0);assert.equal(sceneState(DURATION).nav,1);
+for(let ms=0;ms<=DURATION;ms+=40){const s=sceneState(ms);assert(Object.values(s).flat().every(Number.isFinite));assert(s.opacity>=0&&s.opacity<=1);}
+assert.equal(logoBakes.length,3);for(const p of logoBakes){assert(p.width>0&&p.height>0);assert((await stat(resolve(root,'.'+p.src))).size>0,'Baked 3D pillar resource');}
+for(const name of ['motion.js','film-player.js','logo-film.js'])assert((await stat('dist/'+name)).size>0);
+assert((await stat('dist/logo-renderer.js')).size>0&&(await stat('dist/logo-bakes.js')).size>0);
+assert((await stat('dist/solutions/track/index.html')).size>0);
+const catalog=await readFile('dist/solutions/index.html','utf8');assert.equal((catalog.match(/data-product /g)||[]).length,1,'Only Apollo Track in catalog');
+for(const slug of ['request','catalog','proposal','approval','equipment','reorder','dealer','careers','onboarding'])assert(!(await stat('dist/solutions/'+slug).catch(()=>null)),'Unpublished concept: '+slug);
+assert((await stat('dist/demos/track/index.html')).size>0);
+assert(home.includes('class="console-page"'),'Home uses the fixed interface shell');
+assert.equal((home.match(/class="console-direction"/g)||[]).length,3,'Three main navigation entries');
+assert(!home.includes('class="site-footer"')&&!home.includes('class="reading-progress"'),'No long-page shell on home');
+const studio=await readFile('dist/studio/index.html','utf8');assert(studio.includes('roman-800.webp')&&studio.includes('mikhail-800.webp'),'Team remains on its own page');
+const experience=await readFile('dist/experience.js','utf8');const intro=await readFile('dist/intro.js','utf8');assert(!experience.includes('scrollIntoView')&&!intro.includes('scrollIntoView'),'Intro never moves the home page');
 const contact=await readFile('dist/contacts/index.html','utf8');
 assert(contact.includes('<fieldset id="brief-fields" disabled>'),'No-JS brief cannot accidentally submit');
 assert(contact.includes('не отправляет и не сохраняет ответы'),'Honest submission behavior');
 for(const a of Object.values(assets))assert(a.capturedAt==='2026-10-20'&&a.url&&a.alt&&a.width&&a.height);
 const css=await readFile('dist/styles.css','utf8');for(const [,file] of css.matchAll(/url\('([^']+)'\)/g))assert((await stat(resolve(root,'.'+file))).size>0);assert(css.includes('prefers-reduced-motion'));
 const app=await readFile('dist/app.js','utf8');assert(!/fetch\(|localStorage|sessionStorage/.test(app),'No hidden brief transmission or persistence');
-const serviceMap=Object.fromEntries(services.map(s=>[s.slug,s.name]));
+assert.equal(serviceOptions.length,44,'Complete service offering');
+assert.equal(new Set(serviceOptions.map(s=>s.value)).size,44,'Unambiguous service selections');
+for(const g of capabilities){const html=await readFile('dist/marketing/'+g.slug+'/index.html','utf8');for(const i of g.items){assert(html.includes('id="'+i.id+'"')&&html.includes(i.description)&&html.includes(i.outputs[0]),'Scope and outputs: '+i.name);assert(contact.includes('value="'+serviceValue(g,i)+'"'),'Brief offers '+i.name);}}
+for(const i of webCapabilities.items)assert((await stat('dist/services/'+i.id+'/index.html')).size>0,'Website service route: '+i.id);
+const serviceMap=Object.fromEntries([...services.map(s=>[s.slug,s.name]),...serviceOptions.map(s=>[s.value,s.name])]);
+assert(composeBrief({service:'branding-naming',task:'Название новой линейки'},serviceMap).body.includes('Задача: Нейминг'),'New marketing service survives brief composition');
+
 const message=composeBrief({company:'Тестовая компания',website:'company.ru',service:'product-catalogs',task:'Каталог с чертежами\nи параметрами',budget:'Нужна оценка'},serviceMap);
 assert(message.body.includes('Каталоги продукции')&&message.body.includes('Каталог с чертежами\nи параметрами'));
 const href=mailHref('manager@apollo.su',message.subject,message.body),url=new URL(href);

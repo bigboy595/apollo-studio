@@ -1,3 +1,4 @@
+import './marketing.js';
 import {composeBrief,mailHref} from './brief.js';
 'use strict';
 const $=s=>document.querySelector(s);
@@ -58,6 +59,7 @@ if(form){
  $('#brief-fields').disabled=false;
  const service=$('#brief-service'),allowed=Object.fromEntries([...service.options].filter(o=>o.value).map(o=>[o.value,o.textContent]));
  const selected=new URLSearchParams(location.search).get('service');if(selected in allowed)service.value=selected;
+ const requestedProduct=new URLSearchParams(location.search).get('product');if(requestedProduct){const option=[...service.options].find(o=>o.value.startsWith('product-')&&o.textContent.includes(requestedProduct));if(option)service.value=option.value;}
  const result=$('.brief-result'),output=$('#brief-output'),mail=$('#brief-mail'),status=$('#brief-status');let subject='Проект для Apollo';
  const refreshMail=()=>{const href=mailHref('manager@apollo.su',subject,output.value);mail.href=href;status.textContent=href.length>1900?'Текст готов. Для длинного сообщения удобнее скопировать его и вставить в почту или Telegram.':'Сообщение ещё не отправлено.';};
  form.addEventListener('submit',e=>{e.preventDefault();if(!form.reportValidity())return;const values=Object.fromEntries(new FormData(form).entries());const message=composeBrief(values,allowed);subject=message.subject;output.value=message.body;result.hidden=false;refreshMail();output.focus();result.scrollIntoView({behavior:reduced.matches?'instant':'smooth',block:'nearest'});});
@@ -71,3 +73,7 @@ if(data.metrikaId&&/^\d+$/.test(String(data.metrikaId))){
  $$('a[href^="https://t.me/"],a[href^="mailto:"],a[href^="tel:"]').forEach(a=>a.addEventListener('click',()=>window.ym(data.metrikaId,'reachGoal',a.href.startsWith('mailto:')?'email_click':a.href.startsWith('tel:')?'phone_click':'telegram_click')));
 }
 
+
+// Deep links reveal the selected scope without requiring a second click.
+function revealScope(){const id=decodeURIComponent(location.hash.slice(1));if(!id)return;const target=document.getElementById(id);if(target?.matches('details.capability-item'))target.open=true;}
+revealScope();addEventListener('hashchange',revealScope);

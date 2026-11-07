@@ -1,0 +1,20 @@
+/* Only the embedded copy; the standalone Track project retains its own source. */
+:root{--bg:#060a0c;--panel:#0c1b20;--line:#91bca636;--text:#e6f1e8;--muted:#91ad9a;--lime:#b4dfb1;--cyan:#8acfe5}
+.demo-host{background-color:#060a0c;background-image:radial-gradient(ellipse at 0% 100%,#72be3e17,transparent 60%),radial-gradient(ellipse at 100% 100%,#167dd723,transparent 60%),linear-gradient(#b7d8d008 1px,transparent 1px),linear-gradient(90deg,#b7d8d008 1px,transparent 1px);background-size:auto,auto,70px 70px,70px 70px}
+.launch-card{border-radius:12px;background:linear-gradient(135deg,#19302099,#10253b9c);border-color:#91bca644}
+dialog,.track-window{background:#081518;border-color:#91bca644;border-radius:12px}
+.window-header{background:#0b1a1c;border-color:var(--line)}
+.role-switch{border-radius:7px;border-color:var(--line);background:#08171c}
+.role-switch button{border-radius:4px;color:#91ad9a}
+.role-switch button[aria-selected=true]{background:#294b3680;border-color:#a3d4b266;color:#ddf1df}
+.role-switch button:hover:not([aria-selected=true]){background:#203d2d66}
+:is(input,select,textarea){background:#08171c!important;border-color:#91bca644!important;border-radius:5px;color:#daeadd}
+button{font-weight:400}
+:focus-visible{outline-color:#b5e3b8}
+.status-card,.product-card,.fields-panel,.stage-panel,.documents-panel,.history-panel{background:linear-gradient(135deg,#11291f88,#11243577);border-color:var(--line);border-radius:9px}
+.status-badge,.save-state{color:#b6dabb}
+.primary{border-radius:6px;background:#294b3680;color:#e1efdc;border:1px solid #a3d4b266}
+.secondary,.stage-choice{border-radius:6px;border-color:var(--line)}
+.stage-choice[aria-pressed=true],.stage-choice.active{border-color:#9cc9ab77;background:#1e3b2c80}
+.window-footer{background:#09191c;border-color:var(--line);color:#86a38f}
+.document-dialog,.message-dialog{border-radius:10px;background:#0a1b20;border-color:var(--line)}

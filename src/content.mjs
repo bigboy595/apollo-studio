@@ -1,13 +1,13 @@
 export const config = {
-  "title": "Разработка сайтов для производственных компаний — Apollo",
-  "description": "Сайты для производителей и технических компаний: структура по задачам заказчика, каталоги с параметрами, дизайн и запуск. Кейсы «Фундкреп» и Nikateam.",
+  "title": "Цифровые решения, маркетинг и дизайн — Apollo",
+  "description": "Цифровые продукты и сайты, исследования, брендинг, материалы для продаж, контент, реклама и SEO. Apollo — от задачи бизнеса до согласованного результата.",
   "price": "120 000",
   "currency": "₽",
   "timeline": "4–6 недель",
   "publicDomain": "https://apollo.su",
   "indexable": true,
   "previewOrigin": "https://apollo-industrial.mishanka2008.chatgpt.site",
-  "updatedAt": "2026-10-22",
+  "updatedAt": "2026-11-07",
   "publishedAt": "2026-10-20",
   "metrikaId": null,
   "verification": {
