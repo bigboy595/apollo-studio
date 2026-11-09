@@ -69,7 +69,7 @@ for(const slug of ['request','catalog','proposal','approval','equipment','reorde
 const demo=await readFile('dist/demos/track/index.html','utf8');assert(demo.includes('name="robots" content="noindex,follow"'),'Standalone demo is excluded from indexing');
 for(const p of priorityServices){const html=await readFile('dist'+p.path+'index.html','utf8');assert(html.includes(p.name)&&html.includes(p.modules[0][1]));const parent=await readFile('dist/marketing/'+p.parent+'/index.html','utf8');assert(parent.includes('href="'+p.path+'"'),'Leaf page is linked from its parent');}
 const track=await readFile('dist/solutions/track/index.html','utf8');assert(track.includes('Модель стоимости')&&track.includes('Интеграции')&&trackFaq.every(([q,a])=>track.includes(q)&&track.includes(a)));
-assert(!home.includes('intro-pending'),'First paint never waits for the film');
+assert(home.includes('intro-pending'),'Automatic intro preserves the opening white screen');
 assert(home.includes('class="console-page"'),'Home uses the fixed interface shell');
 assert.equal((home.match(/class="console-direction"/g)||[]).length,3,'Three main navigation entries');
 assert(!home.includes('class="site-footer"')&&!home.includes('class="reading-progress"'),'No long-page shell on home');

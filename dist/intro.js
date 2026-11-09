@@ -1,29 +1,26 @@
+import {createLogoRenderer} from './logo-renderer.js';
+import {createFilmPlayer} from './film-player.js';
 import {logoBakes} from './logo-bakes.js';
 import {DURATION,clamp,smooth,sceneState} from './motion.js';
 const home=document.querySelector('#apollo-home');
 if(home){
  const canvas=home.querySelector('#aurora'),ctx=canvas.getContext('2d'),mark=home.querySelector('#apollo-mark');
- let renderer=null,film=null,stagePromise=null,pillars=[],hasPlayed=false;
- const replay=home.querySelector('#intro-control'),motion=home.querySelector('#motion-control'),content=home.querySelector('.console-content'),header=home.querySelector('.console-header');
+ const renderer=createLogoRenderer(mark),film=createFilmPlayer(),replay=home.querySelector('#intro-control'),motion=home.querySelector('#motion-control'),content=home.querySelector('.console-content'),header=home.querySelector('.console-header');
  const reduced=matchMedia('(prefers-reduced-motion: reduce)'),menu=document.querySelector('#nav-dialog');
- home.dataset.renderer='idle';
- async function prepareStage(){
-  stagePromise??=Promise.all([import('./logo-renderer.js'),import('./film-player.js')]).then(([gl,player])=>{renderer=gl.createLogoRenderer(mark);film=player.createFilmPlayer();pillars=logoBakes.map(meta=>{const image=new Image();image.src=meta.src;return {...meta,image};});renderer?.resize();home.dataset.renderer=renderer?'webgl':'cinematic-sequence';});
-  await stagePromise;
- }
+ const back=performance.getEntriesByType('navigation')[0]?.type==='back_forward';
+ home.dataset.renderer=renderer?'webgl':'cinematic-sequence';
+ const pillars=logoBakes.map(meta=>{const image=new Image();image.src=meta.src;return {...meta,image};});
  const layer=document.createElement('canvas'),lctx=layer.getContext('2d');layer.width=layer.height=512;
  const air=document.createElement('canvas'),actx=air.getContext('2d');
  const bloom=document.createElement('canvas'),bctx=bloom.getContext('2d');bloom.width=bloom.height=112;
  let bootCancelled=false,ready=false,startGeneration=0;
- let w=0,h=0,frame=0,previous=0,lastDraw=0,time=0,introTime=DURATION,inIntro=false,paused=false,menuWasPaused=false;
+ let w=0,h=0,frame=0,previous=0,lastDraw=0,time=0,introTime=0,inIntro=!reduced.matches&&!back,paused=false,menuWasPaused=false;
  function resize(){w=home.clientWidth;h=home.clientHeight;const d=Math.min(devicePixelRatio||1,1.5);canvas.width=Math.round(w*d);canvas.height=Math.round(h*d);ctx?.setTransform(d,0,0,d,0,0);air.width=Math.ceil(w/3);air.height=Math.ceil(h/3);actx.setTransform(1/3,0,0,1/3,0,0);renderer?.resize();draw();}
- function finish(){bootCancelled=true;startGeneration++;inIntro=false;introTime=DURATION;home.classList.remove('is-intro','is-light');home.classList.add('intro-complete');document.documentElement.classList.remove('intro-pending');content.inert=false;content.removeAttribute('aria-hidden');header.inert=false;replay.innerHTML=hasPlayed?'Повторить интро <span aria-hidden="true">↻</span>':'Смотреть интро <span aria-hidden="true">↗</span>';replay.setAttribute('aria-label',hasPlayed?'Посмотреть вступление ещё раз':'Посмотреть 3D-вступление');draw();film?.release();}
+ function finish(){bootCancelled=true;startGeneration++;inIntro=false;introTime=DURATION;home.classList.remove('is-intro','is-light');home.classList.add('intro-complete');document.documentElement.classList.remove('intro-pending');content.inert=false;content.removeAttribute('aria-hidden');header.inert=false;replay.innerHTML='Повторить интро <span aria-hidden="true">↻</span>';replay.setAttribute('aria-label','Посмотреть вступление ещё раз');draw();film.release();}
  async function start(){
-  if(reduced.matches)return;hasPlayed=true;const generation=++startGeneration;
+  if(reduced.matches)return;const generation=++startGeneration;
   introTime=0;inIntro=true;ready=false;home.classList.add('is-intro','is-light');home.classList.remove('intro-complete');document.documentElement.classList.remove('intro-pending');content.inert=true;content.setAttribute('aria-hidden','true');header.inert=true;
   replay.innerHTML='Пропустить интро <span aria-hidden="true">↗</span>';replay.setAttribute('aria-label','Пропустить вступление');setPaused(false);draw();
-  try{await prepareStage();}catch{finish();return;}
-  if(generation!==startGeneration)return;
   if(!renderer)await Promise.race([film.prepare(),new Promise(resolve=>setTimeout(resolve,2000))]);
   if(generation!==startGeneration)return;ready=true;previous=performance.now();
  }
@@ -65,7 +62,7 @@ if(home){
   if(s.opacity<.001){renderer?.render(s);return;}
   lctx.clearRect(0,0,512,512);
   if(renderer?.ready){renderer.render({...s,opacity:1});lctx.drawImage(mark,0,0,512,512);mark.style.opacity='0';}
-  else if(!film?.draw(lctx,ms,0,0,512,512)){
+  else if(!film.draw(lctx,ms,0,0,512,512)){
    for(let i=2;i>=0;i--){const p=pillars[i];if(!p.image.complete||!p.image.naturalWidth)continue;const gh=p.height*512*s.bars[i];lctx.drawImage(p.image,p.x*512,(p.y+p.height)*512-gh,p.width*512,gh);}
   }
   const x=(w-size)/2,y=h*.475-size/2;
@@ -99,6 +96,5 @@ if(home){
  if(menu)new MutationObserver(()=>{if(menu.open){menuWasPaused=paused;setPaused(true);}else if(!menuWasPaused)setPaused(false);}).observe(menu,{attributes:true,attributeFilter:['open']});
  reduced.addEventListener('change',()=>{if(reduced.matches){finish();setPaused(true);}else setPaused(false);replay.hidden=reduced.matches;motion.hidden=reduced.matches;});
  addEventListener('resize',resize);resize();
- finish();
- if(ctx&&!reduced.matches){replay.hidden=false;motion.hidden=false;schedule();}
+ if(ctx&&!reduced.matches){replay.hidden=false;motion.hidden=false;if(back){finish();schedule();}else if(!bootCancelled)start();}else finish();
 }
