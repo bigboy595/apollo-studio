@@ -74,3 +74,6 @@ html:has(.console-page){height:100%;overflow:hidden;scroll-behavior:auto;scroll-
 .apollo-mark{width:min(83vw,580px);aspect-ratio:1;opacity:0}
 @media(max-width:700px){.apollo-mark{width:min(91vw,430px)}}
 @media(max-height:500px) and (min-width:600px){.apollo-mark{width:min(79vh,340px)}}
+
+/* Content is visible on first paint; the full film starts only on request. */
+.home-console{--grid-reveal:1;--content-reveal:1;--nav-reveal:1;--header-reveal:1}

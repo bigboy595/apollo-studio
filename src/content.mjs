@@ -7,7 +7,7 @@ export const config = {
   "publicDomain": "https://apollo.su",
   "indexable": true,
   "previewOrigin": "https://apollo-industrial.mishanka2008.chatgpt.site",
-  "updatedAt": "2026-11-07",
+  "updatedAt": "2026-11-09",
   "publishedAt": "2026-10-20",
   "metrikaId": null,
   "verification": {
