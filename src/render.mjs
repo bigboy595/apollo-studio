@@ -19,7 +19,7 @@ export const navigationDialog=path=>`<dialog id="nav-dialog" class="nav-dialog" 
   <aside class="menu-aside" aria-labelledby="menu-contact-label">
    <p class="eyebrow" id="menu-contact-label">На связи</p>
    <a href="mailto:${c.contacts.email}">${c.contacts.email}</a>
-   <a href="${c.contacts.telegram}" target="_blank" rel="noopener noreferrer">${c.contacts.telegramLabel} <span aria-hidden="true">↗</span></a>
+   <a href="${c.contacts.telegram}" target="_blank" rel="noopener noreferrer">${c.contacts.telegramLabel}${arrow}</a>
   </aside>
  </div>
 </dialog>`;

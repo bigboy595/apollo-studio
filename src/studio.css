@@ -75,7 +75,8 @@
   overflow-wrap: anywhere;
 }
 .menu-aside p.eyebrow { color: var(--lime); font-size: 14px; }
-.menu-aside a { font-size: clamp(17px, 1.65vw, 23px); line-height: 1.4; }
+.menu-aside a { display: inline-flex; align-items: center; gap: 6px; font-size: clamp(17px, 1.65vw, 23px); line-height: 1.4; }
+.menu-aside .arrow { width: 16px; height: 16px; flex-basis: 16px; }
 .menu-close:hover, .menu-layout nav > a:hover, .menu-aside a:hover { color: var(--lime); }
 @media (max-width: 700px) {
   .menu-head { padding-bottom: 16px; }
