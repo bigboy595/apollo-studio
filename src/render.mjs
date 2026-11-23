@@ -8,7 +8,9 @@ export const link=(href,label,cl='text-link')=>`<a class="${cl}" href="${href}">
 export const external=(href,label)=>`<a class="text-link" href="${href}" target="_blank" rel="noopener noreferrer"><span>${label}</span>${arrow}</a>`;
 export const img=(a,attrs='',sizes='(max-width:760px) 92vw, 90vw')=>`<img src="/${a.src}" srcset="${a.srcset.split(', ').map(x=>'/'+x).join(', ')}" sizes="${sizes}" width="${a.width}" height="${a.height}" alt="${esc(a.alt)}" ${attrs}>`;
 export const sectionLabel=(left,right='Apollo / digital studio')=>`<div class="section-label"><p>${left}</p><span>${right}</span></div>`;
-export const titleBlock=(kicker,title,intro='',extra='')=>`<section class="page-hero grid-bg"><div class="wrap"><nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="/">Apollo</a><span>/</span><span aria-current="page">${kicker}</span></nav><p class="eyebrow">${kicker}</p><h1 class="display" data-enter>${title}</h1><div class="hero-bottom"><p class="lead">${intro}</p>${extra}</div></div></section>`;
+export const breadcrumbs=(current,parents=[])=>`<nav class="breadcrumbs" aria-label="Хлебные крошки"><ol><li><a href="/">Apollo</a></li>${parents.map(([url,name])=>`<li><a href="${url}">${esc(name)}</a></li>`).join('')}<li aria-current="page">${esc(current)}</li></ol></nav>`;
+export const titleBlock=(current,title,intro='',extra='',parents=[])=>`<section class="page-hero grid-bg"><div class="wrap">${breadcrumbs(current,parents)}<h1 class="display" data-enter>${title}</h1><div class="hero-bottom"><p class="lead">${intro}</p>${extra}</div></div></section>`;
+export const projectButton=(href='/contacts/')=>link(href,'Обсудить проект','project-button');
 const nav=[['/solutions/','Цифровые решения'],['/marketing/','Маркетинг и дизайн'],['/services/','Сайты для бизнеса'],['/studio/','О нас'],['/contacts/','Контакты']];
 const navLinks=path=>nav.map(([url,name])=>`<a href="${url}" ${path.startsWith(url)?'aria-current="page"':''}>${name}</a>`).join('');
 const logo=`<a class="brand" href="/" aria-label="Apollo — главная"><img src="/assets/apollo-logo.svg" alt="Apollo" width="162" height="47"></a>`;
@@ -23,15 +25,39 @@ export const navigationDialog=path=>`<dialog id="nav-dialog" class="nav-dialog" 
   </aside>
  </div>
 </dialog>`;
-export const contactCta=(title='Обсудим<br>вашу задачу?')=>`<section class="contact-cta" id="contact"><div class="wrap">${sectionLabel('Следующий шаг','От идеи до запуска')}<div class="cta-grid"><h2>${title}</h2><div><p>Расскажите о компании и о том, что хотите изменить. Поможем определить первый шаг и нужный состав работ.</p>${link('/contacts/','Начать проект','button button-dark')}</div></div><div class="cta-links"><a href="${c.contacts.telegram}" target="_blank" rel="noopener noreferrer">${c.contacts.telegramLabel} ↗</a><a href="mailto:${c.contacts.email}">${c.contacts.email} ↗</a><a href="tel:${c.contacts.phone}">${c.contacts.phoneLabel} ↗</a></div></div></section>`;
+function siteFooter(path,cta){
+ return `<footer class="site-footer"><div class="wrap">
+${cta?`  <section class="footer-invitation" id="contact" aria-labelledby="footer-invitation-title" data-gradient-focus>
+   <h2 id="footer-invitation-title">Давайте обсудим<br>вашу задачу</h2>
+   <p>Расскажите о компании и о том, что хотите изменить. Поможем определить первый шаг и состав работ.</p>
+   ${projectButton()}
+  </section>`:''}
+  <div class="footer-columns">
+   <div class="footer-brand">${logo}<p>Цифровые решения,<br>маркетинг и дизайн.</p></div>
+   <nav aria-label="Разделы в подвале"><h2>Разделы</h2>
+    ${navLinks(path)}<a href="/projects/">Проекты</a><a href="/insights/">Материалы</a><a href="/process/">Процесс и стоимость</a>
+   </nav>
+   <nav aria-label="Компетенции в подвале"><h2>Компетенции</h2>
+    ${capabilities.map(g=>`<a href="/marketing/${g.slug}/">${g.name}</a>`).join('')}
+   </nav>
+   <div class="footer-contacts"><h2>На связи</h2>
+    <a href="mailto:${c.contacts.email}">${c.contacts.email}</a>
+    <a href="${c.contacts.telegram}" target="_blank" rel="noopener noreferrer">${c.contacts.telegramLabel}</a>
+    <a href="tel:${c.contacts.phone}">${c.contacts.phoneLabel}</a>
+   </div>
+  </div>
+  <div class="footer-bottom"><span>© Apollo <span data-year>2026</span></span><a href="#top">Наверх <span aria-hidden="true">↑</span></a></div>
+ </div></footer>`;
+}
 export function layout(meta,body,{cta=true}={}){
  const path=meta.path;
  if(path==='/')return `<!doctype html><html lang="ru"><head>${head(meta)}</head><body id="top" class="console-page"><a class="skip" href="#main">Перейти к содержанию</a><main id="main">${body}</main>${navigationDialog(path)}<script id="site-data" type="application/json">${JSON.stringify({metrikaId:c.metrikaId}).replaceAll('<','\\u003c')}</script></body></html>`;
 
  return `<!doctype html><html lang="ru"><head>${head(meta)}</head><body id="top" class="studio-page${path.startsWith('/marketing/')?' marketing-page':''}"><div class="interior-atmosphere" aria-hidden="true"><div></div></div><a class="skip" href="#main">Перейти к содержанию</a><div class="reading-progress" aria-hidden="true"></div>
- <header class="site-header"><div class="wrap header-inner">${logo}<nav class="desktop-nav" aria-label="Основная навигация">${navLinks(path)}</nav><div class="header-actions">${link('/contacts/','Обсудить проект','header-contact')}<button type="button" class="menu-trigger" aria-haspopup="dialog" aria-controls="nav-dialog" aria-label="Открыть меню"><span>Меню</span><i></i></button></div></div><nav class="fallback-nav wrap" aria-label="Разделы сайта">${navLinks(path)}</nav></header>
+ <header class="site-header"><div class="wrap header-inner">${logo}<nav class="desktop-nav" aria-label="Основная навигация">${navLinks(path)}</nav><div class="header-actions">${projectButton()}<button type="button" class="menu-trigger" aria-haspopup="dialog" aria-controls="nav-dialog" aria-label="Открыть меню"><span>Меню</span><i></i></button></div></div><nav class="fallback-nav wrap" aria-label="Разделы сайта">${navLinks(path)}</nav></header>
  ${navigationDialog(path)}
- <main id="main">${body}${cta?contactCta():''}</main><footer class="site-footer"><div class="wrap"><div class="footer-top">${logo}<p>Цифровые решения,<br>маркетинг и дизайн.</p><a class="back-top" href="#top" aria-label="Вернуться наверх">↑</a></div><div class="footer-grid"><div><p class="eyebrow">Разделы</p>${navLinks(path)}<a href="/process/">Процесс и стоимость</a></div><div><p class="eyebrow">Компетенции</p>${capabilities.map(g=>`<a href="/marketing/${g.slug}/">${g.name}</a>`).join('')}</div><div><p class="eyebrow">Связаться</p><a href="${c.contacts.telegram}" target="_blank" rel="noopener noreferrer">${c.contacts.telegramLabel}</a><a href="mailto:${c.contacts.email}">${c.contacts.email}</a><a href="tel:${c.contacts.phone}">${c.contacts.phoneLabel}</a></div></div><div class="footer-bottom"><span>© Apollo <span data-year>2026</span></span><span>Исследуем. Проектируем. Запускаем.</span><a href="/contacts/#brief">Короткий бриф ↗</a></div><div class="footer-word" aria-hidden="true">APOLLO<span>↗</span></div></div></footer>
+ <main id="main">${body}</main>
+ ${siteFooter(path,cta)}
  <dialog class="lightbox" aria-labelledby="lightbox-title"><div class="lightbox-toolbar"><p id="lightbox-title">Просмотр проекта</p><div><button type="button" id="zoom-toggle" aria-pressed="false">Крупнее</button><button type="button" class="lightbox-close" aria-label="Закрыть изображение">Закрыть ×</button></div></div><div class="lightbox-body"><img id="lightbox-image" alt="" width="1333" height="900"></div></dialog>
  <script id="site-data" type="application/json">${JSON.stringify({metrikaId:c.metrikaId}).replaceAll('<','\\u003c')}</script></body></html>`;
 }

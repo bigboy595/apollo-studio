@@ -1,3 +1,4 @@
+import './pointer-light.js';
 import './marketing.js';
 import {composeBrief,mailHref} from './brief.js';
 'use strict';

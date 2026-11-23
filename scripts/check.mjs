@@ -73,7 +73,7 @@ assert(home.includes('intro-pending'),'Automatic intro preserves the opening whi
 assert(home.includes('class="console-page"'),'Home uses the fixed interface shell');
 assert.equal((home.match(/class="console-direction"/g)||[]).length,3,'Three main navigation entries');
 assert(!home.includes('class="site-footer"')&&!home.includes('class="reading-progress"'),'No long-page shell on home');
-const studio=await readFile('dist/studio/index.html','utf8');assert(studio.includes('roman-800.webp')&&studio.includes('mikhail-800.webp'),'Team remains on its own page');
+const studio=await readFile('dist/studio/index.html','utf8');assert(!studio.includes('class="team-grid"')&&studio.includes('id="how-we-work"'),'About shows the work process without the team block');
 const experience=await readFile('dist/experience.js','utf8');const intro=await readFile('dist/intro.js','utf8');assert(!experience.includes('scrollIntoView')&&!intro.includes('scrollIntoView'),'Intro never moves the home page');
 const contact=await readFile('dist/contacts/index.html','utf8');
 assert(contact.includes('<fieldset id="brief-fields" disabled>'),'No-JS brief cannot accidentally submit');

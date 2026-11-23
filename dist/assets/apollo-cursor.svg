@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14">
+  <defs>
+    <linearGradient id="dot">
+      <stop stop-color="#3dd9f5"/>
+      <stop offset="1" stop-color="#c0f53d"/>
+    </linearGradient>
+  </defs>
+  <circle cx="7" cy="7" r="4.5" fill="url(#dot)" stroke="#0c272b"/>
+</svg>
