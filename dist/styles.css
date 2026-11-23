@@ -188,6 +188,7 @@ fieldset{border:0;padding:0;margin:0;min-width:0}fieldset:disabled{opacity:.55}
 }
 .site-footer .footer-columns h2 { margin-bottom: 5px; font-size: 1rem; font-weight: 600; letter-spacing: 0; color: #e2f1e6; }
 .footer-columns a, .footer-brand p { color: #aec5be; font-size: .875rem; line-height: 1.5; overflow-wrap: anywhere; }
+.site-footer .footer-brand .brand { flex: none; }
 .footer-brand p { margin-top: 5px; }
 .footer-columns a:hover, .footer-bottom a:hover { color: #c0f53d; }
 .footer-bottom {
@@ -220,7 +221,7 @@ fieldset{border:0;padding:0;margin:0;min-width:0}fieldset:disabled{opacity:.55}
 /* A native cursor image keeps the hotspot accurate on fast movements. */
 @media (any-hover: hover) and (any-pointer: fine) {
   .console-page, .studio-page {
-    --apollo-cursor: url("/assets/apollo-cursor.svg") 7 7;
+    --apollo-cursor: url("/assets/apollo-cursor.svg?v=2") 13 13;
     --apollo-cursor-action: url("/assets/apollo-cursor-action.svg") 10 10;
     cursor: var(--apollo-cursor), auto;
   }
