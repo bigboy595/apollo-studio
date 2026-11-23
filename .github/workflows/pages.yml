@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 15
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.retry_deployment.outputs.page_url || steps.first_deployment.outputs.page_url }}
     steps:
       - name: Check out Apollo
         uses: actions/checkout@v6
@@ -104,37 +104,25 @@ jobs:
         with:
           name: github-pages-${{ github.run_attempt }}
           path: dist
-      - name: Wait for the Pages artifact to be listed
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PAGES_ARTIFACT: github-pages-${{ github.run_attempt }}
-        shell: bash
-        run: |
-          node --input-type=module <<'NODE'
-          import {setTimeout} from 'node:timers/promises';
-
-          const {GITHUB_API_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID, GH_TOKEN, PAGES_ARTIFACT} = process.env;
-          const url = new URL(`${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts`);
-          url.searchParams.set('name', PAGES_ARTIFACT);
-          const headers = {Authorization: `Bearer ${GH_TOKEN}`, Accept: 'application/vnd.github+json', 'Cache-Control': 'no-cache'};
-
-          for (let attempt = 0; attempt < 12; attempt++) {
-            const response = await fetch(url, {headers, signal: AbortSignal.timeout(10000)});
-            if (!response.ok) throw new Error(`Cannot list Pages artifacts: HTTP ${response.status}`);
-            const {artifacts} = await response.json();
-            if (artifacts.some(artifact => artifact.name === PAGES_ARTIFACT && !artifact.expired)) process.exit(0);
-            await setTimeout(3000);
-          }
-          throw new Error(`Pages artifact is not listed: ${PAGES_ARTIFACT}`);
-          NODE
       - name: Deploy the website
-        id: deployment
+        id: first_deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
+      # Upload can finish before the deployment action can list the artifact.
+      - name: Allow the Pages artifact to propagate
+        if: steps.first_deployment.outcome == 'failure'
+        run: sleep 20
+      - name: Retry deploying the website
+        if: steps.first_deployment.outcome == 'failure'
+        id: retry_deployment
         uses: actions/deploy-pages@v5
         with:
           artifact_name: github-pages-${{ github.run_attempt }}
       - name: Verify the published website and DNS
         env:
-          PAGES_SITE_URL: ${{ steps.deployment.outputs.page_url }}
+          PAGES_SITE_URL: ${{ steps.retry_deployment.outputs.page_url || steps.first_deployment.outputs.page_url }}
         shell: bash
         run: |
           node --input-type=module <<'NODE'
