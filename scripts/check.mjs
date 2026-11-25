@@ -90,6 +90,10 @@ for(const slug of ['request','catalog','proposal','approval','equipment','reorde
 const demo=await readFile('dist/demos/track/index.html','utf8');assert(demo.includes('name="robots" content="noindex,follow"'),'Standalone demo is excluded from indexing');
 for(const p of priorityServices){const html=await readFile('dist'+p.path+'index.html','utf8');assert(html.includes(p.name)&&html.includes(p.modules[0][1]));const parent=await readFile('dist/marketing/'+p.parent+'/index.html','utf8');assert(parent.includes('href="'+p.path+'"'),'Leaf page is linked from its parent');}
 const track=await readFile('dist/solutions/track/index.html','utf8');assert(track.includes('Модель стоимости')&&track.includes('Интеграции')&&trackFaq.every(([q,a])=>track.includes(q)&&track.includes(a)));
+assert(track.includes('data-track-demo')&&track.includes('data-track-role="client"')&&track.includes('data-track-role="manager"')&&track.includes('data-track-approve'),'Track provides the guided approval example for both roles');
+assert(track.includes('data-track-deep')&&track.includes('data-src="/demos/track/"'),'Advanced Track prototype is available in a collapsed disclosure');
+assert(/<video data-track-reel[^>]+autoplay muted playsinline loop /.test(track),'Track hero reel autoplays inline and muted');
+for(const file of ['track-bolt-loop.mp4','track-bolt-poster.webp','order-2481.svg'])assert((await stat('dist/assets/track/'+file)).size>0,'Published Track media: '+file);
 assert(home.includes('intro-pending'),'Automatic intro preserves the opening white screen');
 assert(home.includes('class="console-page"'),'Home uses the fixed interface shell');
 assert.equal((home.match(/class="console-direction"/g)||[]).length,3,'Three main navigation entries');
