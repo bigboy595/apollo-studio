@@ -70,12 +70,17 @@ for(const p of products.filter(p=>p.slug!=='track')){
  const html=await readFile('dist/solutions/'+p.slug+'/index.html','utf8');
  assert(!/(apollo-garage|apollo-task-workspace)\.[a-z0-9]+\.chatgpt\.site/.test(html)&&html.includes('id="demo"'),'Showcase without access to the working app: '+p.name);
  if(p.slug==='garage'){
-  for(const id of ['owner','service']){
-   assert(html.includes('id="gs-'+id+'-video"')&&html.includes('src="/assets/garage/garage-'+id+'-motion.mp4"'),'Garage film: '+id);
-   assert((await stat('dist/assets/garage/garage-'+id+'-motion-poster.webp')).size>0,'Garage film poster');
+  const clips=['garage-loop-hero','garage-owner-motion','garage-service-motion','garage-loop-history'];
+  const videos=[...html.matchAll(/<video data-gs-loop[^>]*>/g)].map(m=>m[0]);
+  assert.equal(videos.length,clips.length);
+  for(const [i,name] of clips.entries()){
+   assert(videos[i].includes('data-src="/assets/garage/'+name+'.mp4"'),'Garage scene: '+name);
+   assert(/ muted playsinline autoplay loop /.test(videos[i])&&!/ controls[ =>]/.test(videos[i]),'Garage clips play inline, muted, on a loop');
+   assert((await stat('dist/assets/garage/'+name+'.mp4')).size>0,'Garage clip exists: '+name);
   }
-  for(const id of ['hero','map','staff','history'])assert(html.includes('src="/assets/garage/garage-loop-'+id+'.mp4"'),'Garage motion chapter: '+id);
-  assert(html.includes('data-gs-motion')&&html.includes('data-gs-explorer')&&html.includes('src="/garage-showcase.js?v=4"'),'Small interactive Garage map');
+  assert(!/data-gs-film|gs-cinema|Смотреть фильм|Смотреть больше/.test(html),'No film launch buttons or modal');
+  assert(html.includes('ТО завершено')&&html.includes('Проверить на следующем ТО')&&html.includes('Передние колодки')&&html.includes('Втулки стабилизатора'),'Garage visit keeps completed and next service distinct');
+  assert(html.includes('data-gs-motion')&&html.includes('data-gs-explorer')&&html.includes('src="/garage-showcase.js?v=5"'),'Small interactive Garage map');
  }else{
   assert(html.includes('data-workspace-demo="task"')&&html.includes('src="/workspace-demo.js"'),'Task demo remains available');
  }

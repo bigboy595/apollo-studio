@@ -3,68 +3,45 @@ if(page){
  const media=matchMedia('(prefers-reduced-motion: reduce)');
  const network=navigator.connection;
  const motion=page.querySelector('[data-gs-motion]');
- const animations=[...page.querySelectorAll('[data-gs-loop]')];
+ const videos=[...page.querySelectorAll('[data-gs-loop]')];
  const visible=new Set();
- const cinema=page.querySelector('.gs-cinema');
- const films=[...cinema.querySelectorAll('video')];
- const panels=[...cinema.querySelectorAll('.gs-player-section')];
  let choice=null;
- let trigger=null;
  const allowed=()=>choice??!(media.matches||network?.saveData);
+
  function sync(){
   const enabled=allowed();
-  motion.textContent=enabled?'Пауза анимации':'Включить анимацию';
-  for(const video of animations){
+  motion.textContent=enabled?'Остановить анимацию':'Включить анимацию';
+  for(const video of videos){
+   const active=enabled&&visible.has(video)&&!document.hidden;
    video.dataset.enabled=String(enabled);
-   if(enabled&&visible.has(video)&&!document.hidden&&!cinema.open){
-    video.play().catch(()=>{});
-   }else video.pause();
+   video.autoplay=active;
+   if(active){
+    if(!video.hasAttribute('src'))video.src=video.dataset.src;
+    if(video.paused)video.play().catch(()=>{});
+   }else if(!video.paused)video.pause();
   }
  }
  motion.hidden=false;
  motion.addEventListener('click',()=>{choice=!allowed();sync();});
- const observer=new IntersectionObserver(entries=>{
-  for(const entry of entries){
-   const video=entry.target;
-   if(entry.isIntersecting&&entry.intersectionRatio>=.26)visible.add(video);
-   else visible.delete(video);
+ const observer='IntersectionObserver' in window?new IntersectionObserver(entries=>{
+  for(const {target,isIntersecting,intersectionRatio} of entries){
+   if(isIntersecting&&intersectionRatio>=.18)visible.add(target);
+   else visible.delete(target);
   }
   sync();
- },{threshold:.26});
- for(const video of animations){
+ },{threshold:.18}):null;
+ for(const video of videos){
   video.muted=true;
   video.addEventListener('playing',()=>video.dataset.started='true');
-  observer.observe(video);
+  video.addEventListener('error',()=>delete video.dataset.started);
+  if(observer)observer.observe(video);
+  else visible.add(video);
  }
  media.addEventListener('change',()=>{choice=null;sync();});
- network?.addEventListener?.('change',()=>sync());
- document.addEventListener('visibilitychange',()=>sync());
+ network?.addEventListener?.('change',sync);
+ document.addEventListener('visibilitychange',sync);
  sync();
 
- if(cinema.showModal){
-  for(const link of page.querySelectorAll('[data-gs-film]')){
-   link.addEventListener('click',event=>{
-    if(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
-    const selected=cinema.querySelector('#gs-'+link.dataset.gsFilm+'-video');
-    if(!selected)return;
-    event.preventDefault();
-    trigger=link;
-    for(const panel of panels)panel.hidden=!panel.contains(selected);
-    cinema.showModal();
-    sync();
-    selected.currentTime=0;
-    selected.play().catch(()=>{});
-   });
-  }
-  cinema.addEventListener('click',event=>{
-   if(event.target===cinema||event.target.closest('[data-gs-close]'))cinema.close();
-  });
-  cinema.addEventListener('close',()=>{
-   for(const video of films)video.pause();
-   sync();
-   trigger?.focus({preventScroll:true});
-  });
- }
  const explorer=page.querySelector('[data-gs-explorer]');
  const buttons=[...explorer.querySelectorAll('[data-gs-node]')];
  const details=[...explorer.querySelectorAll('[data-gs-detail]')];

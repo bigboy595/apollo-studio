@@ -1,68 +1,55 @@
-import {arrow,breadcrumbs,esc,faqBlock,link} from '../render.mjs';
+import {breadcrumbs,esc,faqBlock,link} from '../render.mjs';
 
 const root='/assets/garage/';
-const svg=path=>`<svg viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`;
-const play=svg('<path d="M8 5.5v13l11-6.5z" fill="currentColor"/>');
-const down=svg('<path d="M12 4v15m-5-5 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/>');
-const films=[
- {id:'owner',name:'Apollo Garage. После визита.',label:'Смотреть фильм',duration:'0:25',
-  summary:'Автомобиль на карте. Отмеченная деталь. Запись мастера появляется у владельца. Выполненные работы остаются в истории, а срок ТО виден в кабинете.'},
- {id:'service',name:'От отметки мастера до записи у владельца',label:'Смотреть больше',duration:'0:11',
-  summary:'В рабочем месте мастер выбирает узел, деталь и сторону. В кабинете владельца рядом со схемой детали появляется сохранённая рекомендация.'}
-];
 const chapters=[
- {id:'map',no:'01',tag:'КАРТА АВТОМОБИЛЯ',title:['Знать, где именно.'],description:'Замечание мастера открывается прямо на схеме. Клиент видит нужную деталь, сторону автомобиля и что предстоит проверить.',meta:'Кабинет владельца',poster:'screen-map.webp',alt:'Карта Garage: Toyota Camry и узлы автомобиля.'},
- {id:'staff',no:'02',tag:'РАБОЧЕЕ МЕСТО МАСТЕРА',title:['Запись сделана.', 'Клиент её видит.'],description:'Мастер отмечает деталь и добавляет пояснение. Та же запись появляется в кабинете владельца рядом со схемой узла.',meta:'От мастера к владельцу',poster:'screen-staff.webp',alt:'Рабочее место Garage: сохранённая рекомендация в карточке автомобиля.'},
- {id:'history',no:'03',tag:'ИСТОРИЯ И ПЛАН ТО',title:['Что было.', 'Что дальше.'],description:'Выполненные работы хранятся с датой и пробегом. До следующего ТО видно, сколько осталось километров и какая дата запланирована.',meta:'История обслуживания',poster:'screen-history.webp',alt:'История работ и оставшийся пробег до ТО в Garage.'}
+ {id:'map',no:'01',tag:'КАБИНЕТ ВЛАДЕЛЬЦА',title:['Замечание','рядом с деталью.'],description:'После ТО владелец открывает визит и находит рекомендацию на схеме. По отметке понятно, о какой детали говорил мастер и что именно нужно проверить.',meta:'От карты до истории',video:'garage-owner-motion.mp4',poster:'garage-owner-motion-poster.webp',alt:'Toyota Camry в ролике о кабинете владельца.'},
+ {id:'staff',no:'02',tag:'РАБОЧЕЕ МЕСТО МАСТЕРА',title:['Мастер','оставляет запись.'],description:'Мастер выбирает узел, отмечает деталь и описывает, что проверить при следующем обслуживании. В кабинете клиента появляется та же запись.',meta:'От мастера к владельцу',video:'garage-service-motion.mp4',poster:'garage-service-motion-poster.webp',alt:'Интерфейс Garage: отметка по результатам визита.'},
+ {id:'history',no:'03',tag:'СЕРВИСНАЯ ИСТОРИЯ',title:['Что сделали.','Что дальше.'],description:'Выполненные работы сохранены с датой и пробегом. К следующему ТО клиент может вернуться к рекомендациям прошлого визита и заранее обсудить их с сервисом.',meta:'История и следующее ТО',video:'garage-loop-history.mp4',poster:'screen-history.webp',alt:'История работ и оставшийся пробег до ТО в Garage.',width:1140,height:444}
 ];
 const parts=[
- {id:'rear',label:'Подвеска',head:'Втулки стабилизатора',tag:'Рекомендация',text:'Задняя ось, справа. Проверить втулки при следующем визите.',x:22.5,y:66},
- {id:'engine',label:'Двигатель',head:'Масло и фильтр',tag:'Выполнено',text:'Замена масла и фильтра сохранена в истории с датой и пробегом.',x:84,y:43},
- {id:'front',label:'Тормоза',head:'Передние тормоза',tag:'Осмотр',text:'Колодки и диски передней оси осмотрены при последнем ТО.',x:77,y:68}
+ {id:'rear',label:'Втулки стабилизатора',location:'Задняя подвеска · справа',note:'На осмотре мастер отметил износ втулки.',next:'Проверить состояние втулок и люфт стабилизатора при следующем ТО.',x:22.5,y:67},
+ {id:'front',label:'Передние колодки',location:'Тормоза · передняя ось',note:'Мастер заметил износ колодок при осмотре. В этом визите их не меняли.',next:'На следующем ТО измерить остаточную толщину колодок и решить с мастером, нужна ли замена.',x:77,y:68}
 ];
-const src=n=>root+n;
-const filmUrl=f=>src('garage-'+f.id+'-motion.mp4');
-const filmPoster=f=>src('garage-'+f.id+'-motion-poster.webp');
-const movieLink=(f,className='')=>`<a class="gm-watch ${className}" data-gs-film="${f.id}" href="${filmUrl(f)}"><span class="gm-play">${play}</span><span>${f.label}</span><small>${f.duration}</small></a>`;
-function loop(id,poster,alt,width,height){
+
+function loop({video,poster,alt='',width=1152,height=648},hero=false){
  return `<div class="gm-loop" data-gs-stage>
-  <img src="${src(poster)}" alt="${esc(alt)}" width="${width}" height="${height}" ${id==='hero'?'fetchpriority="high"':'loading="lazy"'}>
-  <video data-gs-loop muted playsinline loop preload="none" aria-hidden="true" tabindex="-1" poster="${src(poster)}" width="720" height="406">
-   <source src="${src('garage-loop-'+id+'.mp4')}" type="video/mp4">
-  </video></div>`;
+  <img src="${root+poster}" alt="${esc(alt)}" width="${width}" height="${height}" ${hero?'fetchpriority="high"':'loading="lazy"'}>
+  <video data-gs-loop data-src="${root+video}" muted playsinline autoplay loop preload="none" aria-hidden="true" tabindex="-1" width="1152" height="648"></video>
+ </div>`;
 }
-const player=f=>`<section class="gs-player-section" hidden>
- <div class="gm-player-bar"><strong>Apollo Garage</strong><p>${esc(f.name)}</p><button type="button" aria-label="Закрыть фильм" data-gs-close>×</button></div>
- <video id="gs-${f.id}-video" aria-label="${esc(f.name)}" aria-describedby="gs-${f.id}-summary" width="1152" height="648" poster="${filmPoster(f)}" controls playsinline preload="none">
-  <source src="${filmUrl(f)}" type="video/mp4"><p><a href="${filmUrl(f)}">Открыть видео</a>.</p>
- </video><p class="gm-player-summary" id="gs-${f.id}-summary">${f.summary}</p>
- </section>`;
+
 function chapter(c){
  return `<article class="gm-chapter gm-chapter-${c.id}" id="garage-${c.id}">
   <div class="gm-shell gm-chapter-grid">
-   <div class="gm-chapter-copy"><p class="gm-eyebrow"><span>${c.no}</span> / ${c.tag}</p><h3>${c.title.map(esc).join('<br>')}</h3><p>${c.description}</p>${c.id==='staff'?movieLink(films[1]):''}</div>
+   <div class="gm-chapter-copy"><p class="gm-eyebrow"><span>${c.no}</span> / ${c.tag}</p><h3>${c.title.map(esc).join('<br>')}</h3><p>${c.description}</p></div>
    <figure class="gm-frame">
-    <div class="gm-frame-top"><span></span><b>Apollo / Garage</b><small>${c.meta}</small></div>
-    ${loop(c.id,c.poster,c.alt,1140,444)}
+    <figcaption class="gm-frame-top"><b>Apollo / Garage</b><span>${c.meta}</span></figcaption>
+    ${loop(c)}
    </figure>
   </div>
  </article>`;
 }
+
 function map(){
- return `<section class="gm-explore" id="garage-explore" aria-labelledby="gm-explore-heading">
- <div class="gm-shell" data-gs-explorer>
-  <div class="gm-explore-head"><p class="gm-eyebrow">ПОПРОБУЙТЕ КАРТУ</p><h2 id="gm-explore-heading">Найдите отметку.</h2><p>Выберите один из трёх узлов на тестовом автомобиле.</p></div>
+ return `<section class="gm-explore" id="demo" aria-labelledby="gm-explore-heading">
+ <div class="gm-shell" id="garage-explore" data-gs-explorer>
+  <div class="gm-explore-head"><p class="gm-eyebrow">ПРИМЕР В КАБИНЕТЕ ВЛАДЕЛЬЦА</p><h2 id="gm-explore-heading">Визит завершён.<br>План остался.</h2><p>Владелец забрал машину из сервиса. В кабинете он видит, что уже сделали и что мастер просит проверить на следующем ТО.</p></div>
+  <div class="gm-visit" role="group" aria-label="Что осталось после визита">
+   <div class="gm-visit-done"><span class="gm-visit-icon" aria-hidden="true">✓</span><div><p>ТО завершено</p><strong>Масло и фильтр заменены</strong><span>Осмотр подвески и тормозов проведён.</span></div></div>
+   <div class="gm-visit-next"><span class="gm-visit-icon" aria-hidden="true">2</span><div><p>На следующем ТО</p><strong>Две проверки по рекомендации мастера</strong><span>Нажмите на отметку, чтобы прочитать, что проверить.</span></div></div>
+  </div>
   <div class="gm-explorer">
    <div class="gm-map-stage">
-    <div class="gm-map-top"><span>АПОЛЛО / КАРТА</span><span>TOYOTA CAMRY XV70</span></div>
-    <div class="gm-car"><img src="${src('sedan.webp')}" width="1200" height="393" alt="Toyota Camry, вид сбоку" loading="lazy">${parts.map((n,i)=>`<button type="button" class="gm-pin" style="--gm-x:${n.x}%;--gm-y:${n.y}%" data-gs-node="${n.id}" aria-controls="gs-detail-${n.id}" aria-pressed="${i===0}" aria-label="${n.label}">+</button>`).join('')}</div>
+    <div class="gm-map-top"><span>КАРТА РЕКОМЕНДАЦИЙ</span><span>TOYOTA CAMRY XV70</span></div>
+    <div class="gm-car"><img src="${root}sedan.webp" width="1200" height="393" alt="Toyota Camry, вид сбоку. На схеме две отметки мастера." loading="lazy">${parts.map((n,i)=>`<button type="button" class="gm-pin" style="--gm-x:${n.x}%;--gm-y:${n.y}%" data-gs-node="${n.id}" aria-controls="gs-detail-${n.id}" aria-pressed="${i===0}" aria-label="${n.label}">${i+1}</button>`).join('')}</div>
+    <div class="gm-detail-switches" role="group" aria-label="Рекомендации на следующее ТО">${parts.map((n,i)=>`<button type="button" data-gs-node="${n.id}" aria-controls="gs-detail-${n.id}" aria-pressed="${i===0}"><span aria-hidden="true">${i+1}</span>${n.label}</button>`).join('')}</div>
    </div>
-   <div class="gm-detail">
-    <div aria-live="polite">${parts.map((n,i)=>`<div id="gs-detail-${n.id}" data-gs-detail="${n.id}"${i?' hidden':''}><p class="gm-detail-tag">${n.tag}</p><h3>${n.head}</h3><p>${n.text}</p></div>`).join('')}</div>
-    <div class="gm-detail-switches" role="group" aria-label="Узлы автомобиля">${parts.map((n,i)=>`<button type="button" data-gs-node="${n.id}" aria-controls="gs-detail-${n.id}" aria-pressed="${i===0}">${n.label}</button>`).join('')}</div>
-   </div></div>
+   <div class="gm-detail" aria-live="polite">${parts.map((n,i)=>`<div id="gs-detail-${n.id}" data-gs-detail="${n.id}"${i?' hidden':''}><p class="gm-detail-tag">Проверить на следующем ТО</p><h3>${n.label}</h3><p class="gm-location">${n.location}</p><p>${n.note}</p><p class="gm-next"><strong>Что проверить</strong>${n.next}</p></div>`).join('')}</div>
+  </div>
+  <p class="gm-demo-note">Демонстрационные данные одного визита.</p>
  </div></section>`;
 }
+
 export function garageShowcase(product){
  const brief='/contacts/?product='+encodeURIComponent(product.name)+'#brief';
  return `<div class="gs-page gm-page">
@@ -70,28 +57,27 @@ export function garageShowcase(product){
    <div class="gm-shell gm-hero-inner">${breadcrumbs('Apollo Garage',[['/solutions/','Цифровые решения']])}
     <div class="gm-hero-copy"><p class="gm-brand"><img src="/assets/apollo-symbol.svg" width="24" height="24" alt=""> Apollo Garage</p>
      <h1 id="gm-title">После визита<br>всё на виду.</h1>
-     <p>Сервисная история автомобиля, замечания мастера и следующее ТО в одном кабинете.</p>
-     <div class="gm-hero-actions">${movieLink(films[0])}<a href="#demo" class="gm-jump">Как это работает ${down}</a></div>
+     <p>Что сделали в сервисе и что проверить при следующем ТО — в кабинете владельца автомобиля.</p>
+     <div class="gm-hero-actions"><a href="#demo" class="gm-jump">Посмотреть пример визита</a></div>
     </div>
    </div>
-   <div class="gm-hero-grid gm-shell">${loop('hero','garage-reveal.webp','',1600,669)}
-    <div class="gm-hero-meta"><span>01 / КАБИНЕТ ВЛАДЕЛЬЦА</span><button type="button" data-gs-motion hidden>Пауза анимации</button><span>02 / РАБОЧЕЕ МЕСТО МАСТЕРА</span></div>
+   <div class="gm-hero-grid gm-shell">${loop({video:'garage-loop-hero.mp4',poster:'garage-reveal.webp',width:1600,height:669},true)}
+    <div class="gm-hero-meta"><span>Кабинет владельца и рабочее место мастера</span><button type="button" data-gs-motion hidden>Остановить анимацию</button></div>
    </div>
   </section>
-  <section id="demo" class="gm-demo" aria-labelledby="gm-demo-heading">
-   <div class="gm-demo-head gm-shell"><p class="gm-eyebrow">ОДИН ВИЗИТ В СЕРВИС</p><h2 id="gm-demo-heading">Отметка. Запись. История.</h2>
-    <nav class="gm-scenes" aria-label="Три сцены Garage"><a href="#garage-map">01 <span>Карта</span></a><a href="#garage-staff">02 <span>Запись</span></a><a href="#garage-history">03 <span>История</span></a></nav>
+  ${map()}
+  <section class="gm-demo" aria-labelledby="gm-demo-heading">
+   <div class="gm-demo-head gm-shell"><p class="gm-eyebrow">КАК РАБОТАЕТ APOLLO GARAGE</p><h2 id="gm-demo-heading">От осмотра к следующему ТО.</h2>
+    <nav class="gm-scenes" aria-label="Возможности Garage"><a href="#garage-map">01 <span>Карта</span></a><a href="#garage-staff">02 <span>Запись мастера</span></a><a href="#garage-history">03 <span>История</span></a></nav>
    </div>
    ${chapters.map(chapter).join('')}
   </section>
-  ${map()}
   <section class="gm-contact gm-shell" id="faq" aria-labelledby="gm-contact-heading">
    <div><p class="gm-eyebrow">APOLLO GARAGE ДЛЯ АВТОСЕРВИСА</p><h2 id="gm-contact-heading">Начните с одного визита.</h2><p>Выберем тип обслуживания и согласуем, что получает владелец после выдачи автомобиля.</p>
     <div class="gm-actions">${link(brief,'Обсудить Garage','button')}${link('/solutions/','Другие продукты Apollo')}</div>
    </div>
    <div>${faqBlock(product.faq)}<p class="gm-disclosure">Ролики показывают интерфейс Garage на тестовых данных.</p></div>
   </section>
-  <dialog class="gs-cinema" aria-label="Фильм Apollo Garage">${films.map(player).join('')}</dialog>
-  <script type="module" src="/garage-showcase.js?v=4"></script>
+  <script type="module" src="/garage-showcase.js?v=5"></script>
  </div>`;
 }
