@@ -3,14 +3,14 @@ import {breadcrumbs,esc,faqBlock,link} from '../render.mjs';
 const asset='/assets/task/';
 const chapters=[
  {id:'task-project',nav:'Проекты и задачи',tag:'ПРОЕКТЫ И ЗАКАЗЫ',title:'У заказа есть план.',copy:'В карточке видны этап, срок и ответственный. Материалы, задачи и согласования собраны здесь же. Команда открывает заказ и понимает, что уже сделано и кто берётся за следующий шаг.',caption:'Карточка заказа и список задач',alt:'Проект «Опытная партия крепежа» в Apollo Task: этапы работы, задачи и материалы.'},
- {id:'task-proposal',nav:'Коммерческие предложения',tag:'КОММЕРЧЕСКИЕ ПРЕДЛОЖЕНИЯ',title:'Из расчёта — в предложение.',copy:'Укажите клиента, состав поставки и условия. Конструктор рассчитает итог по позициям и покажет, каких данных не хватает. После проверки КП можно выгрузить в Word или сохранить в PDF.',caption:'Конструктор коммерческого предложения',alt:'Шаги подготовки КП в Apollo Task: данные клиента, состав поставки, стоимость и проверка.'},
+ {id:'task-proposal',nav:'Коммерческие предложения',tag:'КОММЕРЧЕСКИЕ ПРЕДЛОЖЕНИЯ',title:'Из расчёта — в предложение.',copy:'Укажите клиента, состав поставки и условия. Конструктор рассчитает итог по позициям и покажет, каких данных не хватает. После проверки КП можно выгрузить в Word или сохранить в PDF.',caption:'Конструктор коммерческого предложения',alt:'Конструктор КП в Apollo Task: изменение количества, пересчёт суммы и предпросмотр.'},
  {id:'task-review',nav:'Согласования',tag:'ВНУТРЕННЕЕ СОГЛАСОВАНИЕ',title:'У версии есть решение.',copy:'Отправьте конкретную версию на проверку. Назначенный сотрудник согласует её или вернёт с правками. Решение и комментарий останутся в истории.',caption:'Запрос, решение и история',alt:'Запрос на согласование коммерческого предложения, форма решения и результат в истории Apollo Task.'}
 ];
 const demoSteps=['Взять задачу','Передать КП','Согласовать','Завершить'];
 function reel(stem,alt,hero=false){
  return `<div class="at-reel">
-  <img src="${asset+stem}.webp" width="${hero?960:1024}" height="${hero?540:576}" ${hero?'fetchpriority="high"':'loading="lazy"'} alt="${esc(alt)}">
-  <video data-task-reel data-src="${asset+stem}.mp4" autoplay muted playsinline loop preload="none" aria-hidden="true" tabindex="-1" width="${hero?960:1024}" height="${hero?540:576}"></video>
+  <img src="${asset+stem}-interface.webp" width="1280" height="720" ${hero?'fetchpriority="high"':'loading="lazy"'} alt="${esc(alt)}">
+  <video data-task-reel data-src="${asset+stem}-interface.mp4" autoplay muted playsinline loop preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video>
  </div>`;
 }
 function chapter(scene){
@@ -52,13 +52,13 @@ export function taskShowcase(p){
     <a class="at-start" href="#demo">Попробовать на заказе</a>
    </div>
    <figure class="at-hero-art">
-    ${reel('task-hero','Обложка Apollo Task: стопка документов над металлическим лотком.',true)}
-    <figcaption><span>Проекты, задачи и коммерческие документы</span><button type="button" data-task-motion hidden>Остановить анимацию</button></figcaption>
+    ${reel('task-hero','Рабочий интерфейс Apollo Task: обзор компании, список заказов и карточка проекта.',true)}
+    <figcaption><span>Запись интерфейса Apollo Task · тестовый заказ</span><button type="button" data-task-motion hidden>Остановить анимацию</button></figcaption>
    </figure>
   </div></section>
   ${demo()}
   <section class="at-stories" aria-labelledby="at-stories-title">
-   <div class="at-wrap at-section-head"><p class="at-kicker">В РАБОЧЕМ ИНТЕРФЕЙСЕ</p><h2 id="at-stories-title">Один заказ. Три сцены.</h2><p>Экраны Apollo Task на тестовых данных.</p>
+   <div class="at-wrap at-section-head"><p class="at-kicker">В РАБОЧЕМ ИНТЕРФЕЙСЕ</p><h2 id="at-stories-title">Один заказ. Три сцены.</h2><p>Записали реальные действия в приложении на тестовом заказе.</p>
     <nav class="at-scene-links" aria-label="Сцены Apollo Task">${chapters.map(s=>`<a href="#${s.id}">${s.nav}</a>`).join('')}</nav>
    </div>
    ${chapters.map(chapter).join('')}
