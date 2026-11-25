@@ -69,8 +69,8 @@ const catalog=await readFile('dist/solutions/index.html','utf8');assert.deepEqua
 for(const p of products.filter(p=>p.slug!=='track')){
  const html=await readFile('dist/solutions/'+p.slug+'/index.html','utf8');
  assert(html.includes('href="'+p.url+'"')&&html.includes('href="#demo"'),'Example and app link: '+p.name);
- assert(html.includes('href="/workspace-products.css"'),'Example stylesheet: '+p.name);
- assert.equal([...html.matchAll(/class="workspace-mode" type="radio"/g)].length,p.demoTabs.length,'Demo modes: '+p.name);
+ assert(html.includes('href="/workspace-products.css?v=2"'),'Example stylesheet: '+p.name);
+ assert(html.includes('data-workspace-demo="'+p.slug+'"')&&html.includes('src="/workspace-demo.js"'),'Interactive demo: '+p.name);
  assert(html.includes('product='+encodeURIComponent(p.name)+'#brief'),'Product inquiry: '+p.name);
 }
 for(const slug of ['request','catalog','proposal','approval','equipment','reorder','dealer','careers','onboarding'])assert(!(await stat('dist/solutions/'+slug).catch(()=>null)),'Unpublished concept: '+slug);

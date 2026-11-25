@@ -52,6 +52,7 @@ await writeFile(demoPath,demoHtml.replace('<head>','<head>\n  <meta name="robots
 console.log('Built '+routes.length+' content pages + 404. Indexing: '+(canIndex()?'public':'private / noindex')+'.');
 
 
+await copyFile('src/experience/workspace-demo.js','dist/workspace-demo.js');
 await copyFile('src/experience/workspace-products.css','dist/workspace-products.css');
 await copyFile('src/experience/styles.css','dist/experience.css');await copyFile('src/experience/app.js','dist/experience.js');await copyFile('src/experience/intro.js','dist/intro.js');await copyFile('src/experience/logo-renderer.js','dist/logo-renderer.js');await copyFile('src/experience/logo-bakes.js','dist/logo-bakes.js');
 

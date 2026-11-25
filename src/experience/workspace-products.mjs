@@ -1,3 +1,4 @@
+import {workspaceDemo} from './workspace-demo.js';
 import {titleBlock,link,esc,faqBlock,sectionLabel} from '../render.mjs';
 
 export const workspaceProducts=[
@@ -23,11 +24,7 @@ export const workspaceProducts=[
    ['Для автосервиса','Кабинет сотрудника.',['Карточка автомобиля во время обслуживания','Запись работ, замечаний и рекомендаций','Подготовка информации для владельца']]
   ],
   demoTitle:['Один автомобиль.','Две стороны кабинета.'],
-  demoLead:'Посмотрите, что видит владелец после ТО и как ту же рекомендацию оформляет сотрудник сервиса.',
-  demoTabs:[
-   ['Владелец','Toyota Camry',['Выполнено','Замена масла и масляного фильтра'],['Рекомендация','Проверить заднюю подвеску при следующем визите'],['Следующее ТО','Через 10 000 км по плану обслуживания']],
-   ['Сотрудник','Карточка визита',['Автомобиль','Toyota Camry · учебная карточка'],['Узел','Задняя подвеска'],['Запись для клиента','Проверить состояние шарниров при следующем визите']]
-  ],
+  demoLead:'Добавьте замечание от лица мастера. Переключитесь на владельца, чтобы найти эту же запись на схеме автомобиля.',
   pilot:'Начать можно с одного сервиса и типового визита на ТО. Договоримся, какую информацию мастер заполняет и что видит автовладелец после выдачи машины.',
   scope:['Карточка автомобиля и история одного типа визита','Группы замечаний по узлам','Вход владельца и рабочее место сотрудника'],
   inputs:'Понадобятся обезличенные примеры визитов и рекомендаций, правила выдачи доступа клиентам и ответственный за обновление записей.',
@@ -59,12 +56,7 @@ export const workspaceProducts=[
    ['Для сотрудников','Понимать следующий шаг.',['Доска задач и личный кабинет','Поиск по рабочим материалам','Шаблоны для закупок, производства, качества и других отделов']]
   ],
   demoTitle:['Один проект.','От задачи до согласования.'],
-  demoLead:'Переключите задачи, согласования и документы на примере подготовки опытной партии.',
-  demoTabs:[
-   ['Задачи','Опытная партия',['К выполнению','Проверить спецификацию'],['В работе','Подготовить расчёт партии'],['Готово','Получить исходные требования']],
-   ['Согласования','Проверка перед запуском',['Документ','Комплект чертежей'],['Ответственный','Технический отдел'],['Статус','На согласовании']],
-   ['Документы','Материалы проекта',['Требования','Спецификация опытной партии'],['Шаблон','Карта рабочей операции'],['Результат','Коммерческое предложение']]
-  ],
+  demoLead:'Возьмите в работу задачу на расчёт партии, отправьте документ на согласование и закройте задачу.',
   pilot:'Начать можно с одного отдела или процесса, например с передачи согласованного заказа в производство. На пилоте определим, какие задачи, документы и проверки нужны команде.',
   scope:['Пространство для одной команды','Доска, правила назначения задач и согласования','Набор рабочих документов и шаблонов'],
   inputs:'Понадобятся пример проекта, перечень ролей, этапы работы и несколько типовых документов, которые команда готова использовать в пилоте.',
@@ -81,21 +73,18 @@ const miniPreviews={
  task:'<div class="workspace-mini task-mini"><div><span>К выполнению</span><b>Спецификация</b></div><div><span>В работе</span><b>Расчёт партии</b></div><div><span>Готово</span><b>Требования</b></div></div>'
 };
 export function workspaceCard(p,arrow){
- return `<a class="track-catalog-card workspace-catalog-card" data-product data-category="${esc(p.category)}" href="/solutions/${p.slug}/"><div class="track-catalog-copy"><p class="eyebrow">${p.number} / Цифровой продукт</p><h2>Apollo <span>/ ${esc(p.brand)}</span></h2><p>${esc(p.card)}</p><div class="track-catalog-tags">${p.tags.map(tag=>`<span>${esc(tag)}</span>`).join('')}</div><span class="track-open">Подробнее и пример ${arrow}</span></div><div class="track-catalog-preview" aria-hidden="true"><div class="track-mini-top"><span>apollo / ${esc(p.brand)}</span><i>Пример интерфейса</i></div><p>${p.slug==='garage'?'Toyota Camry · История обслуживания':'Проект «Опытная партия»'}</p>${miniPreviews[p.slug]}<div class="track-mini-bottom"><span>${esc(p.tags[0])}</span><span>${esc(p.tags[2])} ↗</span></div></div></a>`;
+ return `<a class="track-catalog-card workspace-catalog-card" data-product data-category="${esc(p.category)}" href="/solutions/${p.slug}/"><div class="track-catalog-copy"><p class="eyebrow">${p.number} / Цифровой продукт</p><h2>Apollo <span>/ ${esc(p.brand)}</span></h2><p>${esc(p.card)}</p><div class="track-catalog-tags">${p.tags.map(tag=>`<span>${esc(tag)}</span>`).join('')}</div><span class="track-open">Подробнее и демо ${arrow}</span></div><div class="track-catalog-preview" aria-hidden="true"><div class="track-mini-top"><span>apollo / ${esc(p.brand)}</span><i>Пример интерфейса</i></div><p>${p.slug==='garage'?'Toyota Camry · История обслуживания':'Проект «Опытная партия»'}</p>${miniPreviews[p.slug]}<div class="track-mini-bottom"><span>${esc(p.tags[0])}</span><span>${esc(p.tags[2])} ↗</span></div></div></a>`;
 }
 
 const lines=([a,b],accent=false)=>esc(a)+'<br>'+(accent?'<span class="lime">'+esc(b)+'</span>':esc(b));
 const list=items=>`<ul class="plain-list">${items.map(item=>`<li>${esc(item)}</li>`).join('')}</ul>`;
 const brief=p=>'/contacts/?product='+encodeURIComponent(p.name)+'#brief';
-function workspaceDemo(p){
- return `<fieldset class="workspace-demo"><legend class="sr-only">Режим просмотра Apollo ${esc(p.brand)}</legend><div class="workspace-demo-modes">${p.demoTabs.map(([label,title,...rows],i)=>`<input class="workspace-mode" type="radio" id="${p.slug}-mode-${i}" name="${p.slug}-mode" aria-controls="${p.slug}-panel-${i}"${i===0?' checked':''}><label for="${p.slug}-mode-${i}">${esc(label)}</label><div class="workspace-demo-panel" id="${p.slug}-panel-${i}"><span class="eyebrow">Apollo / ${esc(p.brand)} · Пример</span><h3>${esc(title)}</h3><dl>${rows.map(([key,value])=>`<div><dt>${esc(key)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl></div>`).join('')}</div></fieldset>`;
-}
 export function workspaceProductPage(p){
- return titleBlock(p.name,lines(p.heading,true),esc(p.intro),link('#demo','Посмотреть интерфейс','button'),[['/solutions/','Цифровые решения']])+ `<div class="wrap track-page workspace-product-page">
+ return titleBlock(p.name,lines(p.heading,true),esc(p.intro),link('#demo','Попробовать демо','button'),[['/solutions/','Цифровые решения']])+ `<div class="wrap track-page workspace-product-page">
  <div class="product-summary"><p>Apollo / <b>${esc(p.brand)}</b></p><span>${esc(p.roles)}</span></div>
+ <section class="section" id="demo"><div class="section-heading"><div><p class="eyebrow">Попробуйте продукт</p><h2>${lines(p.demoTitle)}</h2></div><p>${esc(p.demoLead)}</p></div>${workspaceDemo(p.slug)}<script type="module" src="/workspace-demo.js"></script><p class="demo-caption">Демо работает без входа. Изменения остаются на этой странице до её перезагрузки. Для входа в рабочее приложение нужна учётная запись.</p><div class="workspace-demo-actions">${link(esc(p.url),'Открыть '+esc(p.name),'button')}</div></section>
  <section class="section"><div class="section-heading"><h2>${lines(p.useHeading)}</h2><p>${esc(p.useIntro)}</p></div><div class="engagement-grid">${p.situations.map(([name,body],i)=>`<article><span>0${i+1}</span><h3>${esc(name)}</h3><p>${esc(body)}</p></article>`).join('')}</div></section>
  <section class="section section-tight"><div class="scope-panels">${p.features.map(([label,heading,items])=>`<article><p class="eyebrow">${esc(label)}</p><h2>${esc(heading)}</h2>${list(items)}</article>`).join('')}</div></section>
- <section class="section" id="demo"><div class="section-heading"><div><p class="eyebrow">Интерактивный пример</p><h2>${lines(p.demoTitle)}</h2></div><p>${esc(p.demoLead)}</p></div>${workspaceDemo(p)}<p class="demo-caption">Пример использует тестовые данные. Войти в приложение можно с выданной учётной записью.</p><div class="workspace-demo-actions">${link(esc(p.url),'Открыть '+esc(p.name),'button')}</div></section>
  <section class="section">${sectionLabel('Первый запуск','Пилот')}<div class="section-heading"><h2>Начать с одного<br>процесса.</h2><p>${esc(p.pilot)}</p></div><div class="scope-panels"><article><h3>Состав пилота</h3>${list(p.scope)}</article><article><h3>Что нужно на старте</h3><p>${esc(p.inputs)}</p></article></div><div class="workspace-demo-actions">${link(brief(p),'Обсудить '+esc(p.name),'button')}</div></section>
  <section class="section" id="faq"><div class="section-heading"><h2>Вопросы до запуска.</h2></div>${faqBlock(p.faq)}</section>
  <nav class="section section-tight related-links" aria-label="Другие продукты">${link('/solutions/','Все цифровые продукты')}${link('/solutions/track/','Apollo Track')}${workspaceProducts.filter(other=>other!==p).map(other=>link('/solutions/'+other.slug+'/',other.name)).join('')}</nav></div>`;
