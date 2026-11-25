@@ -71,10 +71,11 @@ for(const p of products.filter(p=>p.slug!=='track')){
  assert(!/(apollo-garage|apollo-task-workspace)\.[a-z0-9]+\.chatgpt\.site/.test(html)&&html.includes('id="demo"'),'Showcase without access to the working app: '+p.name);
  if(p.slug==='garage'){
   for(const id of ['owner','service']){
-   assert(html.includes('id="gs-'+id+'-video"')&&html.includes('src="/assets/garage/garage-'+id+'-film.mp4"'),'Garage film: '+id);
-   assert((await stat('dist/assets/garage/garage-'+id+'-film-poster.webp')).size>0,'Garage film poster');
+   assert(html.includes('id="gs-'+id+'-video"')&&html.includes('src="/assets/garage/garage-'+id+'-motion.mp4"'),'Garage film: '+id);
+   assert((await stat('dist/assets/garage/garage-'+id+'-motion-poster.webp')).size>0,'Garage film poster');
   }
-  assert(html.includes('data-gs-explorer')&&html.includes('src="/garage-showcase.js?v=3"'),'Small interactive Garage map');
+  for(const id of ['hero','map','staff','history'])assert(html.includes('src="/assets/garage/garage-loop-'+id+'.mp4"'),'Garage motion chapter: '+id);
+  assert(html.includes('data-gs-motion')&&html.includes('data-gs-explorer')&&html.includes('src="/garage-showcase.js?v=4"'),'Small interactive Garage map');
  }else{
   assert(html.includes('data-workspace-demo="task"')&&html.includes('src="/workspace-demo.js"'),'Task demo remains available');
  }
