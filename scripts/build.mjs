@@ -16,10 +16,15 @@ const routes=[];
 const add=(path,title,description,body,extra={})=>routes.push({meta:{path,title,description,...extra},body});
 const crumb=(name,path)=>({name,path});
 add('/','Apollo — цифровые решения, сайты и дизайн для бизнеса','Цифровые продукты для продаж, обслуживания и команды. Интерактивные прототипы, сайты и проекты Apollo.',home());
-add('/solutions/','Цифровые продукты Apollo — каталог решений','Apollo Track: статусы заказов, документы и история. Посмотрите интерфейс клиента и менеджера в интерактивной технодемке.',catalog(),{type:'CollectionPage',items:products.map(p=>({name:'Apollo / '+p.brand,path:'/solutions/'+p.slug+'/'})),breadcrumbs:[crumb('Цифровые решения','/solutions/')]});
+add('/solutions/','Цифровые продукты Apollo — каталог решений','Apollo Track, Apollo Garage и Apollo Task: статусы заказов, кабинет автовладельца и рабочее пространство команды.',catalog(),{workspaceStyles:true,type:'CollectionPage',items:products.map(p=>({name:'Apollo '+p.brand,path:'/solutions/'+p.slug+'/'})),breadcrumbs:[crumb('Цифровые решения','/solutions/')]});
 add('/marketing/','Маркетинг и дизайн — Apollo','Исследования и стратегия, брендинг, материалы для продаж, контент, реклама и SEO. Выберите задачу и узнайте состав работ и результат.',marketingIndex(),{type:'CollectionPage',items:capabilities.map(g=>({name:g.name,path:'/marketing/'+g.slug+'/'})),breadcrumbs:[crumb('Маркетинг и дизайн','/marketing/')]});
 for(const g of capabilities){const path='/marketing/'+g.slug+'/';add(path,g.name+' — услуги Apollo',g.intro,capabilityPage(g),{serviceName:g.name,items:g.items.map(i=>({name:i.name,path:priorityFor(g.slug,i.id)?.path||path+'#'+i.id})),breadcrumbs:[crumb('Маркетинг и дизайн','/marketing/'),crumb(g.name,path)]});}
-for(const p of products){const path='/solutions/'+p.slug+'/';add(path,'Apollo Track — статусы заказов для клиентов и менеджеров','Страница статусов заказа для клиента и рабочее место менеджера. Состав пилота Apollo Track, внедрение, модель стоимости, интеграции и интерактивное демо.',productPage(p),{serviceName:'Разработка и внедрение Apollo Track',faqs:trackFaq,breadcrumbs:[crumb('Цифровые решения','/solutions/'),crumb('Apollo Track',path)]});}
+for(const p of products){
+ const path='/solutions/'+p.slug+'/',isTrack=p.slug==='track';
+ const title=isTrack?'Apollo Track — статусы заказов для клиентов и менеджеров':p.title;
+ const description=isTrack?'Страница статусов заказа для клиента и рабочее место менеджера. Состав пилота Apollo Track, внедрение, модель стоимости, интеграции и интерактивное демо.':p.description;
+ add(path,title,description,productPage(p),{serviceName:'Разработка и внедрение Apollo '+p.brand,faqs:isTrack?trackFaq:p.faq,workspaceStyles:!isTrack,breadcrumbs:[crumb('Цифровые решения','/solutions/'),crumb('Apollo '+p.brand,path)]});
+}
 for(const p of priorityServices)add(p.path,p.title,p.description,priorityServicePage(p),{serviceName:p.name,faqs:p.faq,breadcrumbs:[crumb('Маркетинг и дизайн','/marketing/'),crumb(p.parentName,'/marketing/'+p.parent+'/'),crumb(p.shortName,p.path)]});
 add('/projects/','Проекты Apollo — производство, каталоги и технический сервис','Кейсы Apollo: каталог и производственные услуги «Фундкреп», входы по маркам и моделям Nikateam. Логика решений, экраны и действующие сайты.',pages.projectIndex(),{type:'CollectionPage',items:projects.map(p=>({name:p.name,path:'/projects/'+p.slug+'/'})),breadcrumbs:[crumb('Проекты','/projects/')]});
 for(const p of projects){const path='/projects/'+p.slug+'/';add(path,(p.slug==='fundkrep'?'Сайт производителя «Фундкреп» — кейс Apollo':'Сайт технического сервиса Nikateam — кейс Apollo'),p.intro,pages.projectPage(p),{caseName:p.name,image:'/'+p.asset.src,hero:p.asset,breadcrumbs:[crumb('Проекты','/projects/'),crumb(p.name,path)]});}
@@ -47,6 +52,7 @@ await writeFile(demoPath,demoHtml.replace('<head>','<head>\n  <meta name="robots
 console.log('Built '+routes.length+' content pages + 404. Indexing: '+(canIndex()?'public':'private / noindex')+'.');
 
 
+await copyFile('src/experience/workspace-products.css','dist/workspace-products.css');
 await copyFile('src/experience/styles.css','dist/experience.css');await copyFile('src/experience/app.js','dist/experience.js');await copyFile('src/experience/intro.js','dist/intro.js');await copyFile('src/experience/logo-renderer.js','dist/logo-renderer.js');await copyFile('src/experience/logo-bakes.js','dist/logo-bakes.js');
 
 for(const name of ['motion.js','film-player.js','logo-film.js'])await copyFile('src/experience/'+name,'dist/'+name);

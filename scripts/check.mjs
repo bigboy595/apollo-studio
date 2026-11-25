@@ -9,13 +9,14 @@ import {logoFilm} from '../src/experience/logo-film.js';
 import {DURATION,sceneState} from '../src/experience/motion.js';
 import {priorityServices} from '../src/priority-services.mjs';
 import {trackFaq} from '../src/track-page.mjs';
+import {products} from '../src/experience/products.mjs';
 import {composeBrief,mailHref} from '../src/brief.mjs';
 import {capabilities,webCapabilities,serviceOptions,serviceValue} from '../src/capabilities.mjs';
 const root=resolve('dist');
 const originForCheck=()=>String(config.publicDomain||config.previewOrigin).replace(/\/$/,'');
 async function files(dir){const out=[];for(const f of await readdir(dir,{withFileTypes:true})){const p=resolve(dir,f.name);out.push(...f.isDirectory()?await files(p):[p]);}return out;}
 const pages=(await files(root)).filter(p=>p.endsWith('.html')&&!p.includes('/demos/')),titles=new Set(),descriptions=new Set();
-assert.equal(pages.length,33,'32 content pages and 404');
+assert.equal(pages.length,35,'34 content pages and 404');
 let totalAnchors=0,totalImages=0,totalLinks=0;
 for(const path of pages){
  const html=await readFile(path,'utf8');
@@ -64,7 +65,14 @@ assert.equal(logoBakes.length,3);for(const p of logoBakes){assert(p.width>0&&p.h
 for(const name of ['motion.js','film-player.js','logo-film.js'])assert((await stat('dist/'+name)).size>0);
 assert((await stat('dist/logo-renderer.js')).size>0&&(await stat('dist/logo-bakes.js')).size>0);
 assert((await stat('dist/solutions/track/index.html')).size>0);
-const catalog=await readFile('dist/solutions/index.html','utf8');assert.equal((catalog.match(/data-product /g)||[]).length,1,'Only Apollo Track in catalog');
+const catalog=await readFile('dist/solutions/index.html','utf8');assert.deepEqual([...catalog.matchAll(/data-product data-category="[^"]+" href="\/solutions\/([^/]+)\/"/g)].map(m=>m[1]),['track','garage','task'],'Three catalog cards in product order');
+for(const p of products.filter(p=>p.slug!=='track')){
+ const html=await readFile('dist/solutions/'+p.slug+'/index.html','utf8');
+ assert(html.includes('href="'+p.url+'"')&&html.includes('href="#demo"'),'Example and app link: '+p.name);
+ assert(html.includes('href="/workspace-products.css"'),'Example stylesheet: '+p.name);
+ assert.equal([...html.matchAll(/class="workspace-mode" type="radio"/g)].length,p.demoTabs.length,'Demo modes: '+p.name);
+ assert(html.includes('product='+encodeURIComponent(p.name)+'#brief'),'Product inquiry: '+p.name);
+}
 for(const slug of ['request','catalog','proposal','approval','equipment','reorder','dealer','careers','onboarding'])assert(!(await stat('dist/solutions/'+slug).catch(()=>null)),'Unpublished concept: '+slug);
 const demo=await readFile('dist/demos/track/index.html','utf8');assert(demo.includes('name="robots" content="noindex,follow"'),'Standalone demo is excluded from indexing');
 for(const p of priorityServices){const html=await readFile('dist'+p.path+'index.html','utf8');assert(html.includes(p.name)&&html.includes(p.modules[0][1]));const parent=await readFile('dist/marketing/'+p.parent+'/index.html','utf8');assert(parent.includes('href="'+p.path+'"'),'Leaf page is linked from its parent');}

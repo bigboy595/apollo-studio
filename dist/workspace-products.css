@@ -1,0 +1,33 @@
+.product-catalog{display:grid;gap:24px}
+.workspace-mini{min-width:0;margin:0 0 22px}
+.garage-mini{display:grid;gap:14px}
+.garage-mini svg{width:min(100%,340px);height:auto;margin-inline:auto;fill:#112d2b;stroke:#95c9b3;stroke-width:1.4;stroke-linejoin:round}
+.garage-mini .garage-node{fill:#c1ef9f;stroke:#c1ef9f}
+.workspace-mini>div{min-width:0;border:1px solid var(--line);border-radius:7px;padding:12px;background:#0a181e8c}
+.workspace-mini span,.workspace-mini b{display:block;overflow-wrap:anywhere}
+.workspace-mini span{font-size:9px;color:#a0bfb1;margin-bottom:8px}
+.workspace-mini b{font-size:12px;font-weight:500}
+.task-mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.task-mini>div:nth-child(2){border-color:#b7e69b80}
+.workspace-demo{min-width:0;margin:0;padding:clamp(17px,4vw,38px);border:1px solid var(--line);border-radius:12px;background:linear-gradient(135deg,#152c207a,#0c2433a1)}
+.workspace-demo-modes{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+.workspace-mode{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.workspace-demo-modes>label{display:flex;align-items:center;min-height:44px;padding:9px 13px;border:1px solid var(--line);border-radius:6px;cursor:pointer;font-size:12px}
+.workspace-mode:checked+label{background:#b5e396;color:#102218;border-color:#b5e396}
+.workspace-mode:focus-visible+label,.workspace-catalog-card:focus-visible{outline:2px solid #c6f0b9;outline-offset:4px}
+.workspace-demo-panel{display:none;order:1;flex:1 0 100%;min-width:0;margin-top:14px;padding:clamp(18px,3vw,28px);border:1px solid var(--line);border-radius:9px;background:#091519a6}
+.workspace-mode:checked+label+.workspace-demo-panel{display:block}
+.workspace-demo-panel h3{margin:14px 0 20px;font-size:clamp(23px,3vw,38px);letter-spacing:-.04em}
+.workspace-demo-panel dl{margin:0}
+.workspace-demo-panel dl>div{display:grid;grid-template-columns:minmax(110px,1fr) minmax(0,2fr);gap:12px;padding:13px 0;border-top:1px solid var(--line)}
+.workspace-demo-panel dt{color:#a9c3b7}
+.workspace-demo-panel dd{margin:0;overflow-wrap:anywhere}
+.workspace-demo-actions{margin-top:22px}
+@media(max-width:600px){
+ .product-catalog{gap:16px}
+ .task-mini>div{padding:8px}
+ .task-mini b{font-size:9px}
+ .task-mini span{font-size:8px}
+ .workspace-demo-panel dl>div{grid-template-columns:1fr;gap:5px}
+}
+@media(prefers-reduced-motion:reduce){.workspace-catalog-card .track-catalog-preview,.workspace-catalog-card:hover .track-catalog-preview{transform:none;transition:none}}
