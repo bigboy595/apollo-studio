@@ -70,7 +70,7 @@ for(const p of products.filter(p=>p.slug!=='track')){
  const html=await readFile('dist/solutions/'+p.slug+'/index.html','utf8');
  assert(!/(apollo-garage|apollo-task-workspace)\.[a-z0-9]+\.chatgpt\.site/.test(html)&&html.includes('id="demo"'),'Showcase without access to the working app: '+p.name);
  if(p.slug==='garage'){
-  const clips=['garage-loop-hero','garage-owner-motion','garage-service-motion','garage-loop-history'];
+  const clips=['garage-hero-cut','garage-owner-cut','garage-staff-cut','garage-history-cut'];
   const videos=[...html.matchAll(/<video data-gs-loop[^>]*>/g)].map(m=>m[0]);
   assert.equal(videos.length,clips.length);
   for(const [i,name] of clips.entries()){

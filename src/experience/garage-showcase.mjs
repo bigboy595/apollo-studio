@@ -2,9 +2,9 @@ import {breadcrumbs,esc,faqBlock,link} from '../render.mjs';
 
 const root='/assets/garage/';
 const chapters=[
- {id:'map',no:'01',tag:'КАБИНЕТ ВЛАДЕЛЬЦА',title:['Замечание','рядом с деталью.'],description:'После ТО владелец открывает визит и находит рекомендацию на схеме. По отметке понятно, о какой детали говорил мастер и что именно нужно проверить.',meta:'От карты до истории',video:'garage-owner-motion.mp4',poster:'garage-owner-motion-poster.webp',alt:'Toyota Camry в ролике о кабинете владельца.'},
- {id:'staff',no:'02',tag:'РАБОЧЕЕ МЕСТО МАСТЕРА',title:['Мастер','оставляет запись.'],description:'Мастер выбирает узел, отмечает деталь и описывает, что проверить при следующем обслуживании. В кабинете клиента появляется та же запись.',meta:'От мастера к владельцу',video:'garage-service-motion.mp4',poster:'garage-service-motion-poster.webp',alt:'Интерфейс Garage: отметка по результатам визита.'},
- {id:'history',no:'03',tag:'СЕРВИСНАЯ ИСТОРИЯ',title:['Что сделали.','Что дальше.'],description:'Выполненные работы сохранены с датой и пробегом. К следующему ТО клиент может вернуться к рекомендациям прошлого визита и заранее обсудить их с сервисом.',meta:'История и следующее ТО',video:'garage-loop-history.mp4',poster:'screen-history.webp',alt:'История работ и оставшийся пробег до ТО в Garage.',width:1140,height:444}
+ {id:'map',no:'01',tag:'КАБИНЕТ ВЛАДЕЛЬЦА',title:['Замечание','рядом с деталью.'],description:'После ТО владелец открывает визит и находит рекомендацию на схеме. По отметке понятно, о какой детали говорил мастер и что именно нужно проверить.',meta:'От карты до истории',video:'garage-owner-cut.mp4',poster:'garage-owner-motion-poster.webp',alt:'Toyota Camry в ролике о кабинете владельца.'},
+ {id:'staff',no:'02',tag:'РАБОЧЕЕ МЕСТО МАСТЕРА',title:['Мастер','оставляет запись.'],description:'Мастер выбирает узел, отмечает деталь и описывает, что проверить при следующем обслуживании. В кабинете клиента появляется та же запись.',meta:'От мастера к владельцу',video:'garage-staff-cut.mp4',poster:'garage-service-motion-poster.webp',alt:'Интерфейс Garage: отметка по результатам визита.'},
+ {id:'history',no:'03',tag:'СЕРВИСНАЯ ИСТОРИЯ',title:['Что сделали.','Что дальше.'],description:'Выполненные работы сохранены с датой и пробегом. К следующему ТО клиент может вернуться к рекомендациям прошлого визита и заранее обсудить их с сервисом.',meta:'История и следующее ТО',video:'garage-history-cut.mp4',poster:'screen-history.webp',alt:'История работ и оставшийся пробег до ТО в Garage.',width:1140,height:444}
 ];
 const parts=[
  {id:'rear',label:'Втулки стабилизатора',location:'Задняя подвеска · справа',note:'На осмотре мастер отметил износ втулки.',next:'Проверить состояние втулок и люфт стабилизатора при следующем ТО.',x:22.5,y:67},
@@ -61,7 +61,7 @@ export function garageShowcase(product){
      <div class="gm-hero-actions"><a href="#demo" class="gm-jump">Посмотреть пример визита</a></div>
     </div>
    </div>
-   <div class="gm-hero-grid gm-shell">${loop({video:'garage-loop-hero.mp4',poster:'garage-reveal.webp',width:1600,height:669},true)}
+   <div class="gm-hero-grid gm-shell">${loop({video:'garage-hero-cut.mp4',poster:'garage-reveal.webp',width:1600,height:669},true)}
     <div class="gm-hero-meta"><span>Кабинет владельца и рабочее место мастера</span><button type="button" data-gs-motion hidden>Остановить анимацию</button></div>
    </div>
   </section>
