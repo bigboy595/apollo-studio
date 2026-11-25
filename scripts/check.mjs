@@ -82,7 +82,11 @@ for(const p of products.filter(p=>p.slug!=='track')){
   assert(html.includes('ТО завершено')&&html.includes('Проверить на следующем ТО')&&html.includes('Передние колодки')&&html.includes('Втулки стабилизатора'),'Garage visit keeps completed and next service distinct');
   assert(html.includes('data-gs-motion')&&html.includes('data-gs-explorer')&&html.includes('src="/garage-showcase.js?v=5"'),'Small interactive Garage map');
  }else{
-  assert(html.includes('data-workspace-demo="task"')&&html.includes('src="/workspace-demo.js"'),'Task demo remains available');
+  assert(html.includes('data-task-showcase-demo')&&html.includes('data-task-demo-action')&&html.includes('src="/task-showcase.js?v=1"'),'Task guided demo');
+  assert.equal((html.match(/<video data-task-reel[^>]+autoplay muted playsinline loop /g)||[]).length,4,'Task reels are inline, muted and looped');
+  for(const slug of ['hero','project','proposal','review'])for(const ext of ['mp4','webp']){
+   assert((await stat('dist/assets/task/task-'+slug+'.'+ext)).size>0,'Task reel asset '+slug+'.'+ext);
+  }
  }
  assert(html.includes('product='+encodeURIComponent(p.name)+'#brief'),'Product inquiry: '+p.name);
 }

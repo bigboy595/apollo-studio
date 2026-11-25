@@ -23,7 +23,7 @@ for(const p of products){
  const path='/solutions/'+p.slug+'/',isTrack=p.slug==='track';
  const title=isTrack?'Apollo Track — статусы заказов для клиентов и менеджеров':p.title;
  const description=isTrack?'Страница статусов заказа для клиента и рабочее место менеджера. Состав пилота Apollo Track, внедрение, модель стоимости, интеграции и интерактивное демо.':p.description;
- add(path,title,description,productPage(p),{serviceName:'Разработка и внедрение Apollo '+p.brand,faqs:isTrack?trackFaq:p.faq,workspaceStyles:p.slug==='task',garageShowcaseStyles:p.slug==='garage',trackShowcaseStyles:isTrack,breadcrumbs:[crumb('Цифровые решения','/solutions/'),crumb('Apollo '+p.brand,path)]});
+ add(path,title,description,productPage(p),{serviceName:'Разработка и внедрение Apollo '+p.brand,faqs:isTrack?trackFaq:p.faq,taskShowcaseStyles:p.slug==='task',garageShowcaseStyles:p.slug==='garage',trackShowcaseStyles:isTrack,breadcrumbs:[crumb('Цифровые решения','/solutions/'),crumb('Apollo '+p.brand,path)]});
 }
 for(const p of priorityServices)add(p.path,p.title,p.description,priorityServicePage(p),{serviceName:p.name,faqs:p.faq,breadcrumbs:[crumb('Маркетинг и дизайн','/marketing/'),crumb(p.parentName,'/marketing/'+p.parent+'/'),crumb(p.shortName,p.path)]});
 add('/projects/','Проекты Apollo — производство, каталоги и технический сервис','Кейсы Apollo: каталог и производственные услуги «Фундкреп», входы по маркам и моделям Nikateam. Логика решений, экраны и действующие сайты.',pages.projectIndex(),{type:'CollectionPage',items:projects.map(p=>({name:p.name,path:'/projects/'+p.slug+'/'})),breadcrumbs:[crumb('Проекты','/projects/')]});
@@ -37,7 +37,7 @@ add('/process/','Как работает Apollo — этапы, состав и 
 add('/insights/','Материалы о разработке и планировании сайтов — Apollo','Практические материалы Apollo: структура сайта производственной компании, подготовка содержания и факторы стоимости разработки. Основа для обсуждения проекта.',pages.insightsIndex(),{type:'CollectionPage',items:articles.map(a=>({name:a.title,path:'/insights/'+a.slug+'/'})),breadcrumbs:[crumb('Материалы','/insights/')]} );
 for(const a of articles){const path='/insights/'+a.slug+'/';add(path,a.title+' — Apollo',(a.slug==='industrial-website-structure'?'Структура промышленного сайта: роли покупателей, поля карточки продукции, подтверждения возможностей и путь к расчёту. Примеры, таблицы и чек-лист.':'Шаблоны, содержание, каталог, интеграции и запуск: что влияет на бюджет разработки сайта и как сравнивать предложения студий. Практический материал Apollo.'),pages.articlePage(a),{article:a,breadcrumbs:[crumb('Материалы','/insights/'),crumb(a.title,path)]});}
 add('/contacts/','Контакты Apollo — обсудить проект и заполнить бриф','Свяжитесь с Apollo в Telegram, по почте или телефону. Короткий бриф поможет подготовить описание задачи, сроков и бюджета перед разговором о проекте.',pages.contacts(),{type:'ContactPage',breadcrumbs:[crumb('Контакты','/contacts/')]});
-for(const route of routes){const dir='dist'+route.meta.path;await mkdir(dir,{recursive:true});await writeFile(dir+'index.html',layout(route.meta,route.body,{cta:!['/contacts/','/solutions/garage/','/solutions/track/'].includes(route.meta.path)}));}
+for(const route of routes){const dir='dist'+route.meta.path;await mkdir(dir,{recursive:true});await writeFile(dir+'index.html',layout(route.meta,route.body,{cta:!['/contacts/','/solutions/garage/','/solutions/track/','/solutions/task/'].includes(route.meta.path)}));}
 const missing='<section class="not-found wrap"><p class="eyebrow">404 / Страница не найдена</p><h1>Здесь пока<br>нет страницы.</h1><p>Выберите цифровой продукт, услугу или проект Apollo.</p>'+link('/','На главную','button')+'</section>';
 await writeFile('dist/404.html',layout({path:'/404.html',title:'Страница не найдена — Apollo',description:'Такой страницы нет. Посмотрите проекты и услуги студии Apollo или свяжитесь с нами.',noindex:true},missing,{cta:false}));
 await writeFile('dist/styles.css',(await readFile('src/studio.css','utf8'))+'\n'+await readFile('src/responsive.css','utf8'));
@@ -52,7 +52,7 @@ await writeFile(demoPath,demoHtml.replace('<head>','<head>\n  <meta name="robots
 console.log('Built '+routes.length+' content pages + 404. Indexing: '+(canIndex()?'public':'private / noindex')+'.');
 
 
-for(const name of ['garage-showcase.css','garage-showcase.js','track-showcase.css','track-showcase.js'])await copyFile('src/experience/'+name,'dist/'+name);
+for(const name of ['garage-showcase.css','garage-showcase.js','track-showcase.css','track-showcase.js','task-showcase.css','task-showcase.js'])await copyFile('src/experience/'+name,'dist/'+name);
 await copyFile('src/experience/workspace-demo.js','dist/workspace-demo.js');
 await copyFile('src/experience/workspace-products.css','dist/workspace-products.css');
 await copyFile('src/experience/styles.css','dist/experience.css');await copyFile('src/experience/app.js','dist/experience.js');await copyFile('src/experience/intro.js','dist/intro.js');await copyFile('src/experience/logo-renderer.js','dist/logo-renderer.js');await copyFile('src/experience/logo-bakes.js','dist/logo-bakes.js');
