@@ -68,9 +68,16 @@ assert((await stat('dist/solutions/track/index.html')).size>0);
 const catalog=await readFile('dist/solutions/index.html','utf8');assert.deepEqual([...catalog.matchAll(/data-product data-category="[^"]+" href="\/solutions\/([^/]+)\/"/g)].map(m=>m[1]),['track','garage','task'],'Three catalog cards in product order');
 for(const p of products.filter(p=>p.slug!=='track')){
  const html=await readFile('dist/solutions/'+p.slug+'/index.html','utf8');
- assert(html.includes('href="'+p.url+'"')&&html.includes('href="#demo"'),'Example and app link: '+p.name);
- assert(html.includes('href="/workspace-products.css?v=2"'),'Example stylesheet: '+p.name);
- assert(html.includes('data-workspace-demo="'+p.slug+'"')&&html.includes('src="/workspace-demo.js"'),'Interactive demo: '+p.name);
+ assert(!/(apollo-garage|apollo-task-workspace)\.[a-z0-9]+\.chatgpt\.site/.test(html)&&html.includes('href="#demo"'),'Showcase without access to the working app: '+p.name);
+ if(p.slug==='garage'){
+  for(const id of ['owner','service']){
+   assert(html.includes('id="gs-'+id+'-video"')&&html.includes('src="/assets/garage/garage-'+id+'.mp4"'),'Garage film: '+id);
+   assert((await stat('dist/assets/garage/garage-'+id+'-poster.webp')).size>0,'Garage film poster');
+  }
+  assert(html.includes('data-gs-explorer')&&html.includes('src="/garage-showcase.js"'),'Small interactive Garage map');
+ }else{
+  assert(html.includes('data-workspace-demo="task"')&&html.includes('src="/workspace-demo.js"'),'Task demo remains available');
+ }
  assert(html.includes('product='+encodeURIComponent(p.name)+'#brief'),'Product inquiry: '+p.name);
 }
 for(const slug of ['request','catalog','proposal','approval','equipment','reorder','dealer','careers','onboarding'])assert(!(await stat('dist/solutions/'+slug).catch(()=>null)),'Unpublished concept: '+slug);

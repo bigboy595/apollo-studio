@@ -11,7 +11,6 @@ export const workspaceProducts=[
   card:'После визита клиент видит выполненные работы, замечания и план следующего ТО в кабинете своего автомобиля.',
   tags:['История работ','Карта узлов','План ТО'],
   roles:'Владелец / сотрудник автосервиса',
-  url:'https://apollo-garage.mishanka2008.chatgpt.site/',
   useHeading:['От визита в сервис','до следующего ТО.'],
   useIntro:'Мастер объясняет состояние машины при выдаче. В Garage владелец может вернуться к записи позже и увидеть, к какому узлу относится рекомендация.',
   situations:[
@@ -30,7 +29,7 @@ export const workspaceProducts=[
   inputs:'Понадобятся обезличенные примеры визитов и рекомендаций, правила выдачи доступа клиентам и ответственный за обновление записей.',
   faq:[
    ['Зачем кабинет, если клиенту уже выдают заказ-наряд?','Заказ-наряд остаётся документом по конкретному визиту. В кабинете клиент может вернуться к истории машины, найти замечания и понять, что проверить при следующем обслуживании.'],
-   ['Можно посмотреть кабинет без пароля?','На этой странице есть пример с тестовыми данными. Для входа в приложение нужна учётная запись, которую выдаёт автосервис.'],
+   ['Что можно посмотреть на этой странице?','В роликах видно, как мастер добавляет рекомендацию и как владелец открывает её у себя. Ниже можно выбрать узел автомобиля и посмотреть пример записи.'],
    ['Можно перенести данные из программы автосервиса?','Возможность обмена зависит от вашей программы, её интерфейса интеграции и формата данных. Согласуем это отдельно до запуска.']
   ]
  },
@@ -43,7 +42,6 @@ export const workspaceProducts=[
   card:'В одном пространстве — проекты, задачи с ответственными, согласования и документы, по которым работает команда.',
   tags:['Задачи','Согласования','База знаний'],
   roles:'Руководитель / сотрудники / рабочие документы',
-  url:'https://apollo-task-workspace.strvcode888.chatgpt.site/',
   useHeading:['От задачи команды','до согласованного документа.'],
   useIntro:'Когда дедлайны живут в чате, файлы — в папках, а решения — в переписке, на поиск нужного уходит время. Task собирает эту работу в одном пространстве.',
   situations:[
@@ -73,7 +71,7 @@ const miniPreviews={
  task:'<div class="workspace-mini task-mini"><div><span>К выполнению</span><b>Спецификация</b></div><div><span>В работе</span><b>Расчёт партии</b></div><div><span>Готово</span><b>Требования</b></div></div>'
 };
 export function workspaceCard(p,arrow){
- return `<a class="track-catalog-card workspace-catalog-card" data-product data-category="${esc(p.category)}" href="/solutions/${p.slug}/"><div class="track-catalog-copy"><p class="eyebrow">${p.number} / Цифровой продукт</p><h2>Apollo <span>/ ${esc(p.brand)}</span></h2><p>${esc(p.card)}</p><div class="track-catalog-tags">${p.tags.map(tag=>`<span>${esc(tag)}</span>`).join('')}</div><span class="track-open">Подробнее и демо ${arrow}</span></div><div class="track-catalog-preview" aria-hidden="true"><div class="track-mini-top"><span>apollo / ${esc(p.brand)}</span><i>Пример интерфейса</i></div><p>${p.slug==='garage'?'Toyota Camry · История обслуживания':'Проект «Опытная партия»'}</p>${miniPreviews[p.slug]}<div class="track-mini-bottom"><span>${esc(p.tags[0])}</span><span>${esc(p.tags[2])} ↗</span></div></div></a>`;
+ return `<a class="track-catalog-card workspace-catalog-card" data-product data-category="${esc(p.category)}" href="/solutions/${p.slug}/"><div class="track-catalog-copy"><p class="eyebrow">${p.number} / Цифровой продукт</p><h2>Apollo <span>/ ${esc(p.brand)}</span></h2><p>${esc(p.card)}</p><div class="track-catalog-tags">${p.tags.map(tag=>`<span>${esc(tag)}</span>`).join('')}</div><span class="track-open">${p.slug==='garage'?'Подробнее и ролики':'Подробнее и демо'} ${arrow}</span></div><div class="track-catalog-preview" aria-hidden="true"><div class="track-mini-top"><span>apollo / ${esc(p.brand)}</span><i>Пример интерфейса</i></div><p>${p.slug==='garage'?'Toyota Camry · История обслуживания':'Проект «Опытная партия»'}</p>${miniPreviews[p.slug]}<div class="track-mini-bottom"><span>${esc(p.tags[0])}</span><span>${esc(p.tags[2])} ↗</span></div></div></a>`;
 }
 
 const lines=([a,b],accent=false)=>esc(a)+'<br>'+(accent?'<span class="lime">'+esc(b)+'</span>':esc(b));
@@ -82,7 +80,7 @@ const brief=p=>'/contacts/?product='+encodeURIComponent(p.name)+'#brief';
 export function workspaceProductPage(p){
  return titleBlock(p.name,lines(p.heading,true),esc(p.intro),link('#demo','Попробовать демо','button'),[['/solutions/','Цифровые решения']])+ `<div class="wrap track-page workspace-product-page">
  <div class="product-summary"><p>Apollo / <b>${esc(p.brand)}</b></p><span>${esc(p.roles)}</span></div>
- <section class="section" id="demo"><div class="section-heading"><div><p class="eyebrow">Попробуйте продукт</p><h2>${lines(p.demoTitle)}</h2></div><p>${esc(p.demoLead)}</p></div>${workspaceDemo(p.slug)}<script type="module" src="/workspace-demo.js"></script><p class="demo-caption">Демо работает без входа. Изменения остаются на этой странице до её перезагрузки. Для входа в рабочее приложение нужна учётная запись.</p><div class="workspace-demo-actions">${link(esc(p.url),'Открыть '+esc(p.name),'button')}</div></section>
+ <section class="section" id="demo"><div class="section-heading"><div><p class="eyebrow">Попробуйте продукт</p><h2>${lines(p.demoTitle)}</h2></div><p>${esc(p.demoLead)}</p></div>${workspaceDemo(p.slug)}<script type="module" src="/workspace-demo.js"></script><p class="demo-caption">Демо работает на тестовых данных. Изменения остаются на этой странице до её перезагрузки.</p></section>
  <section class="section"><div class="section-heading"><h2>${lines(p.useHeading)}</h2><p>${esc(p.useIntro)}</p></div><div class="engagement-grid">${p.situations.map(([name,body],i)=>`<article><span>0${i+1}</span><h3>${esc(name)}</h3><p>${esc(body)}</p></article>`).join('')}</div></section>
  <section class="section section-tight"><div class="scope-panels">${p.features.map(([label,heading,items])=>`<article><p class="eyebrow">${esc(label)}</p><h2>${esc(heading)}</h2>${list(items)}</article>`).join('')}</div></section>
  <section class="section">${sectionLabel('Первый запуск','Пилот')}<div class="section-heading"><h2>Начать с одного<br>процесса.</h2><p>${esc(p.pilot)}</p></div><div class="scope-panels"><article><h3>Состав пилота</h3>${list(p.scope)}</article><article><h3>Что нужно на старте</h3><p>${esc(p.inputs)}</p></article></div><div class="workspace-demo-actions">${link(brief(p),'Обсудить '+esc(p.name),'button')}</div></section>
