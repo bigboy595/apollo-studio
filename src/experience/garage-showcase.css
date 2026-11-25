@@ -17,14 +17,14 @@
 .gm-hero-actions,.gm-actions{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px 19px;margin-top:22px}
 .gm-jump{display:inline-flex;align-items:center;justify-content:center;min-height:44px;font-size:14px;font-weight:750;color:#e9f5e6;background:#12221e;border:1px solid #8bab9f;border-radius:999px;padding:8px 18px}
 .gm-jump:hover{background:#213c31}
-.gm-hero-grid{position:relative;margin-top:clamp(-21px,-1.4vw,-2px)}
+.gm-hero-grid{position:relative;width:min(calc(100% - var(--gm-pad)*2),1120px);margin-top:clamp(18px,3vw,40px)}
 .gm-loop{position:relative;isolation:isolate;overflow:hidden;background:#0b1517}
 .gm-loop img{object-fit:cover;display:block;width:100%;height:100%}
 .gm-loop video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .38s;pointer-events:none}
 .gm-loop video[data-started=true][data-enabled=true]{opacity:1}
-.gm-hero-grid .gm-loop{height:clamp(214px,36vw,510px);background:#060a0b;mask-image:linear-gradient(0deg,transparent 0%,#000 14%,#000 85%,transparent 100%)}
-.gm-hero-grid .gm-loop :is(img,video){object-position:center 62%}
-.gm-hero-meta{position:relative;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 20px;margin-top:-10px;border-top:1px solid var(--gm-line);padding:12px 0;font-size:13px;color:#b7c8c4}
+.gm-hero-grid .gm-loop{width:100%;aspect-ratio:16/9;border:1px solid var(--gm-line);border-radius:clamp(12px,2.2vw,25px);background:#080e12;box-shadow:0 22px 68px #03070d8c}
+.gm-hero-grid .gm-loop :is(img,video){object-fit:contain}
+.gm-hero-meta{position:relative;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 20px;margin-top:0;padding:12px 0;font-size:13px;color:#b7c8c4}
 .gm-page [data-gs-motion]{background:none;color:#d5e8de;border:0;text-decoration:underline;text-underline-offset:4px;padding:7px 0;min-height:35px;font:inherit;font-size:12px;cursor:pointer}
 .gm-demo-head{padding-top:clamp(65px,8vw,120px);padding-bottom:clamp(32px,4.1vw,66px)}
 .studio-page .gm-page h2{font-weight:600;font-size:clamp(41px,6.3vw,93px);line-height:1;letter-spacing:-.066em;margin:12px 0 19px}
@@ -86,7 +86,6 @@
 @media(max-width:760px){
  .gm-chapter-grid,.gm-chapter-staff .gm-chapter-grid,.gm-explorer,.gm-contact{grid-template-columns:minmax(0,1fr)}
  .gm-chapter-staff .gm-frame{order:initial}
- .gm-hero-grid .gm-loop{height:clamp(210px,44vw,360px)}
  .gm-detail{min-height:270px}
 }
 @media(max-width:500px){
@@ -94,7 +93,7 @@
  .studio-page .gm-page h1{font-size:clamp(47px,13vw,69px)}
  .gm-hero-copy>p:not(.gm-brand){margin-top:14px;font-size:16px}
  .gm-hero-actions{gap:8px 15px;margin-top:17px}
- .gm-hero-grid{margin-top:0}
+ .gm-hero-grid{margin-top:18px}
  .gm-hero-meta{justify-content:center;text-align:center;gap:2px 13px}
  .gm-visit{grid-template-columns:minmax(0,1fr)}
  .gm-frame-top{padding:6px 9px;min-height:32px}

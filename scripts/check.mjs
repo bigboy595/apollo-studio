@@ -70,13 +70,14 @@ for(const p of products.filter(p=>p.slug!=='track')){
  const html=await readFile('dist/solutions/'+p.slug+'/index.html','utf8');
  assert(!/(apollo-garage|apollo-task-workspace)\.[a-z0-9]+\.chatgpt\.site/.test(html)&&html.includes('id="demo"'),'Showcase without access to the working app: '+p.name);
  if(p.slug==='garage'){
-  const clips=['garage-hero-cut','garage-owner-cut','garage-staff-cut','garage-history-cut'];
+  const clips=['garage-hero-interface','garage-map-interface','garage-staff-interface','garage-history-interface'];
   const videos=[...html.matchAll(/<video data-gs-loop[^>]*>/g)].map(m=>m[0]);
   assert.equal(videos.length,clips.length);
   for(const [i,name] of clips.entries()){
    assert(videos[i].includes('data-src="/assets/garage/'+name+'.mp4"'),'Garage scene: '+name);
    assert(/ muted playsinline autoplay loop /.test(videos[i])&&!/ controls[ =>]/.test(videos[i]),'Garage clips play inline, muted, on a loop');
    assert((await stat('dist/assets/garage/'+name+'.mp4')).size>0,'Garage clip exists: '+name);
+   assert(html.includes('/assets/garage/'+name+'.webp')&&(await stat('dist/assets/garage/'+name+'.webp')).size>0,'Garage preview: '+name);
   }
   assert(!/data-gs-film|gs-cinema|Смотреть фильм|Смотреть больше/.test(html),'No film launch buttons or modal');
   assert(html.includes('ТО завершено')&&html.includes('Проверить на следующем ТО')&&html.includes('Передние колодки')&&html.includes('Втулки стабилизатора'),'Garage visit keeps completed and next service distinct');

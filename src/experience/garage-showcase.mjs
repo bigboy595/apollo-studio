@@ -2,19 +2,19 @@ import {breadcrumbs,esc,faqBlock,link} from '../render.mjs';
 
 const root='/assets/garage/';
 const chapters=[
- {id:'map',no:'01',tag:'КАБИНЕТ ВЛАДЕЛЬЦА',title:['Замечание','рядом с деталью.'],description:'После ТО владелец открывает визит и находит рекомендацию на схеме. По отметке понятно, о какой детали говорил мастер и что именно нужно проверить.',meta:'От карты до истории',video:'garage-owner-cut.mp4',poster:'garage-owner-motion-poster.webp',alt:'Toyota Camry в ролике о кабинете владельца.'},
- {id:'staff',no:'02',tag:'РАБОЧЕЕ МЕСТО МАСТЕРА',title:['Мастер','оставляет запись.'],description:'Мастер выбирает узел, отмечает деталь и описывает, что проверить при следующем обслуживании. В кабинете клиента появляется та же запись.',meta:'От мастера к владельцу',video:'garage-staff-cut.mp4',poster:'garage-service-motion-poster.webp',alt:'Интерфейс Garage: отметка по результатам визита.'},
- {id:'history',no:'03',tag:'СЕРВИСНАЯ ИСТОРИЯ',title:['Что сделали.','Что дальше.'],description:'Выполненные работы сохранены с датой и пробегом. К следующему ТО клиент может вернуться к рекомендациям прошлого визита и заранее обсудить их с сервисом.',meta:'История и следующее ТО',video:'garage-history-cut.mp4',poster:'screen-history.webp',alt:'История работ и оставшийся пробег до ТО в Garage.',width:1140,height:444}
+ {id:'map',no:'01',tag:'КАБИНЕТ ВЛАДЕЛЬЦА',title:['Замечание','рядом с деталью.'],description:'После ТО владелец открывает визит и находит рекомендацию на схеме. По отметке понятно, о какой детали говорил мастер и что именно нужно проверить.',meta:'От карты до истории',video:'garage-map-interface.mp4',poster:'garage-map-interface.webp',alt:'Кабинет владельца: задняя ось Camry и рекомендация проверить втулки стабилизатора.'},
+ {id:'staff',no:'02',tag:'РАБОЧЕЕ МЕСТО МАСТЕРА',title:['Мастер','оставляет запись.'],description:'Мастер выбирает узел, отмечает деталь и описывает, что проверить при следующем обслуживании. В кабинете клиента появляется та же запись.',meta:'От мастера к владельцу',video:'garage-staff-interface.mp4',poster:'garage-staff-interface.webp',alt:'Мастер в Garage указывает узел, деталь и сторону, добавляет комментарий и сохраняет запись.'},
+ {id:'history',no:'03',tag:'СЕРВИСНАЯ ИСТОРИЯ',title:['Что сделали.','Что дальше.'],description:'Выполненные работы сохранены с датой и пробегом. К следующему ТО клиент может вернуться к рекомендациям прошлого визита и заранее обсудить их с сервисом.',meta:'История и следующее ТО',video:'garage-history-interface.mp4',poster:'garage-history-interface.webp',alt:'Выполненные работы и запланированное обслуживание в кабинете владельца.'}
 ];
 const parts=[
  {id:'rear',label:'Втулки стабилизатора',location:'Задняя подвеска · справа',note:'На осмотре мастер отметил износ втулки.',next:'Проверить состояние втулок и люфт стабилизатора при следующем ТО.',x:22.5,y:67},
  {id:'front',label:'Передние колодки',location:'Тормоза · передняя ось',note:'Мастер заметил износ колодок при осмотре. В этом визите их не меняли.',next:'На следующем ТО измерить остаточную толщину колодок и решить с мастером, нужна ли замена.',x:77,y:68}
 ];
 
-function loop({video,poster,alt='',width=1152,height=648},hero=false){
+function loop({video,poster,alt='',width=1280,height=720},hero=false){
  return `<div class="gm-loop" data-gs-stage>
   <img src="${root+poster}" alt="${esc(alt)}" width="${width}" height="${height}" ${hero?'fetchpriority="high"':'loading="lazy"'}>
-  <video data-gs-loop data-src="${root+video}" muted playsinline autoplay loop preload="none" aria-hidden="true" tabindex="-1" width="1152" height="648"></video>
+  <video data-gs-loop data-src="${root+video}" muted playsinline autoplay loop preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video>
  </div>`;
 }
 
@@ -61,8 +61,8 @@ export function garageShowcase(product){
      <div class="gm-hero-actions"><a href="#demo" class="gm-jump">Посмотреть пример визита</a></div>
     </div>
    </div>
-   <div class="gm-hero-grid gm-shell">${loop({video:'garage-hero-cut.mp4',poster:'garage-reveal.webp',width:1600,height:669},true)}
-    <div class="gm-hero-meta"><span>Кабинет владельца и рабочее место мастера</span><button type="button" data-gs-motion hidden>Остановить анимацию</button></div>
+   <div class="gm-hero-grid gm-shell">${loop({video:'garage-hero-interface.mp4',poster:'garage-hero-interface.webp',alt:'Кабинет владельца Camry после визита: пробег, следующее ТО и две рекомендации.'},true)}
+    <div class="gm-hero-meta"><span>Запись интерфейса Garage · тестовый автомобиль</span><button type="button" data-gs-motion hidden>Остановить анимацию</button></div>
    </div>
   </section>
   ${map()}
@@ -76,7 +76,7 @@ export function garageShowcase(product){
    <div><p class="gm-eyebrow">APOLLO GARAGE ДЛЯ АВТОСЕРВИСА</p><h2 id="gm-contact-heading">Начните с одного визита.</h2><p>Выберем тип обслуживания и согласуем, что получает владелец после выдачи автомобиля.</p>
     <div class="gm-actions">${link(brief,'Обсудить Garage','button')}${link('/solutions/','Другие продукты Apollo')}</div>
    </div>
-   <div>${faqBlock(product.faq)}<p class="gm-disclosure">Ролики показывают интерфейс Garage на тестовых данных.</p></div>
+   <div>${faqBlock(product.faq)}<p class="gm-disclosure">Ролики показывают реальные действия в Apollo Garage. Данные автомобиля и визитов тестовые.</p></div>
   </section>
   <script type="module" src="/garage-showcase.js?v=5"></script>
  </div>`;
