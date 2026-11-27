@@ -86,7 +86,7 @@ for(const p of products.filter(p=>p.slug!=='track')){
   assert(html.includes('data-task-showcase-demo')&&html.includes('data-task-demo-action')&&html.includes('src="/task-showcase.js?v=1"'),'Task guided demo');
   assert.equal((html.match(/<video data-task-reel[^>]+autoplay muted playsinline loop /g)||[]).length,4,'Task reels are inline, muted and looped');
   for(const slug of ['hero','project','proposal','review'])for(const ext of ['mp4','webp']){
-   const media='task-'+slug+'-interface.'+ext;
+   const media='task-'+slug+'-glide.'+ext;
    assert(html.includes('/assets/task/'+media)&&(await stat('dist/assets/task/'+media)).size>0,'Task interface recording '+media);
   }
  }

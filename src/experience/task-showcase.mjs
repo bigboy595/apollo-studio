@@ -9,8 +9,8 @@ const chapters=[
 const demoSteps=['Взять задачу','Передать КП','Согласовать','Завершить'];
 function reel(stem,alt,hero=false){
  return `<div class="at-reel">
-  <img src="${asset+stem}-interface.webp" width="1280" height="720" ${hero?'fetchpriority="high"':'loading="lazy"'} alt="${esc(alt)}">
-  <video data-task-reel data-src="${asset+stem}-interface.mp4" autoplay muted playsinline loop preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video>
+  <img src="${asset+stem}-glide.webp" width="1280" height="720" ${hero?'fetchpriority="high"':'loading="lazy"'} alt="${esc(alt)}">
+  <video data-task-reel data-src="${asset+stem}-glide.mp4" autoplay muted playsinline loop preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video>
  </div>`;
 }
 function chapter(scene){
