@@ -1,4 +1,5 @@
 import {breadcrumbs,esc,faqBlock,link} from '../render.mjs';
+import {productPurchase} from './product-purchase.mjs';
 
 const asset='/assets/task/';
 const chapters=[
@@ -49,7 +50,7 @@ export function taskShowcase(p){
     <p class="at-mark"><img src="/assets/apollo-symbol.svg" width="24" height="24" alt=""> Apollo Task</p>
     <h1 id="at-title">Проекты. Задачи.<br><span>Документы.</span></h1>
     <p>Рабочее пространство для команды: ведите заказы, собирайте коммерческие предложения и согласовывайте документы.</p>
-    <a class="at-start" href="#demo">Попробовать на заказе</a>
+    <div class="at-hero-actions"><a class="at-start" href="#demo">Попробовать на заказе</a><a class="at-start at-start-outline" href="#purchase">Купить Apollo Task</a></div>
    </div>
    <figure class="at-hero-art">
     ${reel('task-hero','Рабочий интерфейс Apollo Task: обзор компании, список заказов и карточка проекта.',true)}
@@ -63,6 +64,7 @@ export function taskShowcase(p){
    </div>
    ${chapters.map(chapter).join('')}
   </section>
+  ${productPurchase('task',brief)}
   <section class="at-contact at-wrap" id="faq" aria-labelledby="at-contact-title">
    <div><p class="at-kicker">APOLLO TASK ДЛЯ БИЗНЕСА</p><h2 id="at-contact-title">Начните с одного процесса.</h2><p>Разберём типовой заказ: кто берёт задачи, какие документы готовит и кто принимает решение. По нему подберём настройку рабочего пространства.</p><div class="at-actions">${link(brief,'Обсудить Apollo Task','button')}${link('/solutions/','Другие продукты Apollo')}</div></div>
    <div>${faqBlock(p.faq)}</div>

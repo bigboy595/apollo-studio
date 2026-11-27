@@ -1,4 +1,5 @@
 import {breadcrumbs,esc,faqBlock,link} from '../render.mjs';
+import {productPurchase} from './product-purchase.mjs';
 
 const root='/assets/garage/';
 const chapters=[
@@ -58,7 +59,7 @@ export function garageShowcase(product){
     <div class="gm-hero-copy"><p class="gm-brand"><img src="/assets/apollo-symbol.svg" width="24" height="24" alt=""> Apollo Garage</p>
      <h1 id="gm-title">После визита<br>всё на виду.</h1>
      <p>Что сделали в сервисе и что проверить при следующем ТО — в кабинете владельца автомобиля.</p>
-     <div class="gm-hero-actions"><a href="#demo" class="gm-jump">Посмотреть пример визита</a></div>
+     <div class="gm-hero-actions"><a href="#demo" class="gm-jump">Посмотреть пример визита</a><a href="#purchase" class="gm-jump gm-jump-outline">Купить Apollo Garage</a></div>
     </div>
    </div>
    <div class="gm-hero-grid gm-shell">${loop({video:'garage-hero-glide.mp4',poster:'garage-hero-glide.webp',alt:'Кабинет владельца Camry после визита: пробег, следующее ТО и две рекомендации.'},true)}
@@ -72,6 +73,7 @@ export function garageShowcase(product){
    </div>
    ${chapters.map(chapter).join('')}
   </section>
+  ${productPurchase('garage',brief)}
   <section class="gm-contact gm-shell" id="faq" aria-labelledby="gm-contact-heading">
    <div><p class="gm-eyebrow">APOLLO GARAGE ДЛЯ АВТОСЕРВИСА</p><h2 id="gm-contact-heading">Начните с одного визита.</h2><p>Выберем тип обслуживания и согласуем, что получает владелец после выдачи автомобиля.</p>
     <div class="gm-actions">${link(brief,'Обсудить Garage','button')}${link('/solutions/','Другие продукты Apollo')}</div>

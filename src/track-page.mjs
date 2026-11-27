@@ -1,4 +1,5 @@
-import {breadcrumbs,link,faqBlock} from './render.mjs';
+import {breadcrumbs,esc,link,faqBlock} from './render.mjs';
+import {productPurchase} from './experience/product-purchase.mjs';
 export const trackFaq=[
  ['Apollo Track — это готовая CRM?','Это решение под согласованный процесс заказа: клиентский интерфейс, статусы, документы и рабочее место ответственного. Оно может дополнять CRM или учётную систему. Состав рабочей версии определяем до разработки; опубликованное окно — интерактивный прототип.'],
  ['Можно начать без интеграции с 1С или CRM?','Да. В пилоте сотрудник может обновлять заказ вручную. Сначала согласуем статусы, документы, роли и правила обновления. Необходимость автоматического обмена оцениваем после проверки этого процесса.'],
@@ -10,6 +11,11 @@ export const trackFaq=[
 
 const art='/assets/track/';
 const brief='/contacts/?product='+encodeURIComponent('Страница заказа')+'#brief';
+const scenes=[
+ {slug:'order',nav:'Кабинет клиента',role:'КАБИНЕТ КЛИЕНТА',headline:'Весь заказ по одной ссылке.',copy:'Клиент видит текущий этап, ближайший шаг и дату готовности. В той же карточке можно открыть документы и посмотреть историю заказа.',caption:'Этап, документы, история',alt:'Кабинет клиента Apollo Track: статус заказа № 2481, документы и история.'},
+ {slug:'drawing',nav:'Согласование чертежа',role:'СОГЛАСОВАНИЕ',headline:'Одна версия чертежа для всех.',copy:'Менеджер передаёт чертёж на проверку. У клиента появляется кнопка согласования. После подтверждения в заказе виден переход к производству.',caption:'От версии 03 до производства',alt:'Менеджер отправляет чертёж на согласование, клиент открывает его и подтверждает в Apollo Track.'},
+ {slug:'update',nav:'Обновление этапа',role:'РАБОЧЕЕ МЕСТО МЕНЕДЖЕРА',headline:'Обновил этап. Клиент уже видит.',copy:'Менеджер выбирает «Готов к отгрузке», добавляет комментарий и сохраняет. Клиент сразу видит новый статус, а запись остаётся в истории заказа.',caption:'Новый статус и запись в истории',alt:'Сохранение этапа «Готов к отгрузке» в Apollo Track и результат в кабинете клиента.'}
+];
 const phases=['Чертёж принят','На согласовании','В производстве','Готов к отгрузке'];
 const marks={
  file:'<path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6m-6 4h6"/>',
@@ -56,12 +62,19 @@ function demo(){
   </div>
  </section>`;
 }
-function handoff(){
- return `<section class="tk-handoff" aria-labelledby="tk-handoff-heading">
-  <div class="tk-wrap tk-handoff-grid">
-   <div><p class="tk-kicker">ОДНО ОБНОВЛЕНИЕ</p><h2 id="tk-handoff-heading">Менеджер меняет этап.<br>Клиент видит результат.</h2><p>Для клиента важен смысл статуса: что изменилось, нужно ли согласование и чего ждать дальше. У менеджера остаётся история обновлений и документы заказа.</p></div>
-   <figure class="tk-relay" aria-label="Пример передачи статуса от менеджера к клиенту"><div class="tk-relay-card"><span>${icon('manager')} Менеджер</span><b>Изготовление</b><small>Этап сохранён</small></div><div class="tk-relay-line" aria-hidden="true"><i></i></div><div class="tk-relay-card tk-relay-client"><span>${icon('client')} Клиент</span><b>Заказ в производстве</b><small>Далее — контроль качества</small></div></figure>
+function reel(slug,alt,hero=false){
+ const asset=art+'track-'+slug+'-glide.';
+ return `<div class="tk-stage-media"><img src="${asset}webp" width="1280" height="720" ${hero?'fetchpriority="high"':'loading="lazy"'} alt="${esc(alt)}"><video data-track-reel data-src="${asset}mp4" autoplay muted playsinline loop preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video></div>`;
+}
+function workflow(){
+ return `<section class="tk-stories" aria-labelledby="tk-stories-heading">
+  <div class="tk-wrap tk-stories-head"><p class="tk-kicker">В ИНТЕРФЕЙСЕ APOLLO TRACK</p><h2 id="tk-stories-heading">От чертежа до отгрузки.</h2><p>Один тестовый заказ в кабинете клиента и в рабочем окне менеджера.</p>
+   <nav class="tk-scene-links" aria-label="Сценарии Apollo Track">${scenes.map(c=>`<a href="#track-${c.slug}">${c.nav}</a>`).join('')}</nav>
   </div>
+  ${scenes.map(c=>`<article class="tk-scene tk-scene-${c.slug}" id="track-${c.slug}">
+    <div class="tk-wrap tk-scene-grid"><div class="tk-scene-copy"><p class="tk-kicker">${c.role}</p><h3>${c.headline}</h3><p>${c.copy}</p></div>
+    <figure class="tk-stage"><figcaption><strong>Apollo / Track</strong><span>${c.caption}</span></figcaption>${reel(c.slug,c.alt)}</figure></div>
+   </article>`).join('')}
  </section>`;
 }
 function pilot(){
@@ -80,24 +93,21 @@ export function trackPage(){
    <div class="tk-wrap">${breadcrumbs('Apollo Track',[['/solutions/','Цифровые решения']])}
     <div class="tk-hero-grid">
      <div class="tk-hero-copy"><p class="tk-brand"><img src="/assets/apollo-symbol.svg" width="24" height="24" alt=""> Apollo Track</p><h1 id="tk-title">Статус заказа.<br><span>В одном окне.</span></h1><p>От чертежа до отгрузки. Клиент знает, на каком этапе заказ и что будет дальше. Менеджер обновляет всё в одной карточке.</p>
-      <div class="tk-hero-actions"><a class="tk-btn tk-btn-primary" href="#demo">Попробовать на заказе</a><a class="tk-btn tk-btn-quiet" href="#pilot">Что входит в пилот</a></div>
+      <div class="tk-hero-actions"><a class="tk-btn tk-btn-primary" href="#demo">Попробовать на заказе</a><a class="tk-btn tk-btn-quiet" href="#purchase">Купить Apollo Track</a></div>
      </div>
-     <figure class="tk-stage">
-      <div class="tk-stage-media"><img src="${art}track-bolt-poster.webp" width="960" height="640" fetchpriority="high" alt="Стальной фундаментный болт с гайками и шайбами — деталь демонстрационного заказа."><video data-track-reel data-src="${art}track-bolt-loop.mp4" autoplay muted playsinline loop preload="none" aria-hidden="true" tabindex="-1" width="960" height="640"></video></div>
-      <figcaption class="tk-stage-meta"><span>ДЕТАЛЬ 01 / ТЕСТОВЫЙ ЗАКАЗ № 2481</span><b>М24 × 800 мм</b></figcaption>
-      <div class="tk-stage-status" aria-hidden="true"><span>ЗАКАЗ № 2481</span><strong>Чертёж согласован</strong><div><i></i><i></i><i></i><i></i></div></div>
-     </figure>
+     <figure class="tk-stage tk-hero-stage">${reel('hero','Интерфейс Apollo Track: заказ клиента, выбор этапа менеджером, чертёж и готовность к отгрузке.',true)}</figure>
     </div>
-    <div class="tk-hero-foot"><span>Кабинет клиента · Рабочее место менеджера</span><button type="button" data-track-motion hidden>Остановить анимацию</button></div>
+    <div class="tk-hero-foot"><span>Запись интерфейса Apollo Track · тестовый заказ</span><button type="button" data-track-motion hidden>Остановить анимацию</button></div>
    </div>
   </section>
   ${demo()}
-  ${handoff()}
+  ${workflow()}
   ${pilot()}
+  ${productPurchase('track',brief)}
   <section class="tk-contact tk-wrap" id="faq" aria-labelledby="tk-contact-heading">
    <div><p class="tk-kicker">APOLLO TRACK ДЛЯ БИЗНЕСА</p><h2 id="tk-contact-heading">Покажите, как у вас идёт заказ.</h2><p>Возьмём один типовой пример и решим, какие этапы и документы стоит показать клиенту.</p><div class="tk-contact-actions">${link(brief,'Обсудить пилот Track','button')}${link('/solutions/','Все продукты Apollo')}</div></div>
    <div>${faqBlock(trackFaq)}</div>
   </section>
-  <script type="module" src="/track-showcase.js?v=1"></script>
+  <script type="module" src="/track-showcase.js?v=2"></script>
  </div>`;
 }

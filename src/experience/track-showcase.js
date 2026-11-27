@@ -90,8 +90,7 @@ if(page){
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  const network=navigator.connection;
  const motion=page.querySelector('[data-track-motion]');
- const reel=page.querySelector('[data-track-reel]');
- const relay=page.querySelector('.tk-relay');
+ const reels=[...page.querySelectorAll('[data-track-reel]')];
  const inView=new Set();
  let preference=null;
  const allowed=()=>preference??!(reduced.matches||network?.saveData);
@@ -99,13 +98,14 @@ if(page){
   const animate=allowed();
   motion.textContent=animate?'Остановить анимацию':'Включить анимацию';
   page.dataset.trackMotion=String(animate);
-  relay.dataset.inView=String(inView.has(relay)&&!document.hidden);
-  const play=animate&&inView.has(reel)&&!document.hidden;
-  reel.autoplay=play;
-  if(play){
-   if(!reel.hasAttribute('src'))reel.src=reel.dataset.src;
-   if(reel.paused)reel.play().catch(()=>{});
-  }else if(!reel.paused)reel.pause();
+  for(const reel of reels){
+   const play=animate&&inView.has(reel)&&!document.hidden;
+   reel.autoplay=play;
+   if(play){
+    if(!reel.hasAttribute('src'))reel.src=reel.dataset.src;
+    if(reel.paused)reel.play().catch(()=>{});
+   }else if(!reel.paused)reel.pause();
+  }
  }
  const observe='IntersectionObserver' in window?new IntersectionObserver(entries=>{
   for(const {target,isIntersecting,intersectionRatio} of entries){
@@ -114,13 +114,13 @@ if(page){
   }
   sync();
  },{threshold:.18}):null;
- for(const element of [reel,relay]){
-  if(observe)observe.observe(element);
-  else inView.add(element);
+ for(const reel of reels){
+  reel.muted=true;
+  reel.addEventListener('playing',()=>reel.dataset.started='true');
+  reel.addEventListener('error',()=>delete reel.dataset.started);
+  if(observe)observe.observe(reel);
+  else inView.add(reel);
  }
- reel.muted=true;
- reel.addEventListener('playing',()=>reel.dataset.started='true');
- reel.addEventListener('error',()=>delete reel.dataset.started);
  motion.hidden=false;
  motion.addEventListener('click',()=>{preference=!allowed();sync();});
  reduced.addEventListener('change',()=>{preference=null;sync();});
